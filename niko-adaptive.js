@@ -1,6 +1,7 @@
 // Studio Niko Design — V6 adaptive bilateral phase estimator; not a medical device.
 import {angle,clamp} from './niko-native.js';
-export const ADAPTIVE_VERSION='6.0.0';
+export const ADAPTIVE_VERSION='6.1.0';
+export const SELECTED_TUNING=Object.freeze({tau:65,fraction:.18});
 const quantile=(values,q)=>{const a=[...values].sort((x,y)=>x-y),i=(a.length-1)*q,j=Math.floor(i);return a[j]+(a[Math.min(j+1,a.length-1)]-a[j])*(i-j);};
 const median=a=>quantile(a,.5);
 function characterize(window,fraction){

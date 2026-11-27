@@ -125,7 +125,9 @@ try:
             assert decrypted['clinical_validation'] is False
             assert decrypted['precision_core'] == '1.0.0'
             assert decrypted['native_engine'] == '5.1.0'
-            assert decrypted['adaptive_engine'] == '6.0.0'
+            assert decrypted['adaptive_engine'] == '6.1.0'
+            assert decrypted['adaptive_tuning'] == {'tau': 65, 'fraction': 0.18}
+            assert 'detected_alternations' in decrypted and 'steps' not in decrypted
             assert page.locator('#exportPassword').input_value() == ''
             assert not errors, errors
             # V10 comparison with the same application scripts and two CSS variants.
