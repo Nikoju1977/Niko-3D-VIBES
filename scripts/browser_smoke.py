@@ -21,7 +21,7 @@ try:
             diag=page.evaluate("window.StudioNikoCore.diagnostic()")
             assert 'Studio Niko Core: 0.1.0' in diag
             assert 'Aucune donnée de projet' in diag
-            assert 'NIKO Native V6' in page.locator('#gestureEngine').inner_text()
+            assert 'NIKO Native V6.1' in page.locator('#gestureEngine').inner_text()
             assert not (root / 'engine.js').exists()
             assert (root / 'niko-native.js').exists()
             assert page.locator('#measurementQuality').inner_text() == 'Aucune mesure'
@@ -126,6 +126,8 @@ try:
             assert decrypted['precision_core'] == '1.0.0'
             assert decrypted['native_engine'] == '5.1.0'
             assert decrypted['adaptive_engine'] == '6.1.0'
+            assert decrypted['cadence_unit'] == 'detected_knee_alternations_per_minute'
+            assert 'alternances/min' in page.locator('#cadence').locator('..').inner_text()
             assert decrypted['adaptive_tuning'] == {'tau': 65, 'fraction': 0.18}
             assert 'detected_alternations' in decrypted and 'steps' not in decrypted
             assert page.locator('#exportPassword').input_value() == ''

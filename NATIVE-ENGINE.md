@@ -17,3 +17,5 @@ Robust rolling quantiles estimate the center and threshold of bilateral knee pha
 
 ## V6.1 — Classical tuning candidate
 IBM experiment abandoned by owner; no QPU job was submitted. Historical experiment remains reproducible with default tau=65 ms/fraction=.22. CPU exhaustive four-option search selected tau=65 ms/fraction=.18 on its training objective; synthetic holdout MAE was .3480699646 vs .3833318986 for baseline, both full coverage and zero false outputs on tested negatives. Selection is explicitly passed by the application, not an automatic model update. Added distinct synthetic test profiles with harmonic distortion, offsets, aspect ratios and seeded noise; acceptance thresholds predeclared in tests, not clinical. Export records the chosen parameters and names the count detected_alternations, not steps (breaking JSON key change, versioned candidate). No medical validation, hardware benchmark, real camera or quantum execution claimed.
+
+V6.1 UI and session metadata explicitly use detected knee alternations/minute, not footsteps. Existing per-frame cadence_spm field is retained for compatibility; the top-level cadence_unit defines its meaning.
