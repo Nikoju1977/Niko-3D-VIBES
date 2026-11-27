@@ -1,3 +1,7 @@
+# Avatar WebGL — candidat V3.2
+
+Import local GLB/VRM autonome (100 Mo maximum), matériaux et textures originaux, éclairage trois points, ombres, ACES, caméra orbitale et PNG. Animation expérimentale des huit segments des membres pour VRM humanoïde ; GLB générique sans mapping de squelette reste statique. Aucun modèle photoréaliste fourni ni génération de visage à partir d'une photo. Internet nécessaire pour télécharger Three.js 0.180.0 et three-vrm 3.4.4 au premier import ; aucun envoi du fichier local. Dépendances et rendu WebGL à qualifier sur navigateur réel. Le mode procédural reste disponible.
+
 # V3.2 — Avatar Motion (candidate)
 
 Atelier procédural local : nom, style humanoïde/robot/néon, couleur, morphologie et rotation. Pose neutre sans caméra ; capture réelle MediaPipe normalisée, sans données inventées. Enregistrement de 18 000 images maximum, export JSON et PNG. Pas de modèle GLB riggé, de génération photoréaliste ou de retargeting Blender validé. CI à confirmer.
