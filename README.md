@@ -1,3 +1,19 @@
+## Validation renforcée V3.3
+
+Le workflow ajoute une épreuve WebGL Chromium (SwiftShader) : création d’un singe par prompt, rendu, export PNG/GLB et réimport. Les bibliothèques WebGL sont téléchargées à la demande ; un échec CDN fait échouer le contrôle. Le test ne valide ni une caméra physique ni une reconstruction faciale réelle. Le guide de démarrage couvre les 11 ateliers.
+
+# V3.3 — Avatar Morph (candidat)
+
+Transformation textuelle déterministe par catalogue local : singe, chat, loup, alien, robot, humain ; couleur et style cyberpunk. Maillages stylisés WebGL, suivi facial MediaPipe de tête/bouche/clignements et visage texturé estimé depuis un portrait local. Export GLB de la pose actuelle (pas de rig exporté ni d'animation). Aucune photo publiée ou envoyée ; modèles et bibliothèques téléchargés à la demande. Aucun moteur texte-vers-3D libre ni photoréalisme garanti. Tests Node et UI à lancer ; WebGL/CDN/visage réel à vérifier séparément.
+
+# Avatar WebGL — candidat V3.2
+
+Import local GLB/VRM autonome (100 Mo maximum), matériaux et textures originaux, éclairage trois points, ombres, ACES, caméra orbitale et PNG. Animation expérimentale des huit segments des membres pour VRM humanoïde ; GLB générique sans mapping de squelette reste statique. Aucun modèle photoréaliste fourni ni génération de visage à partir d'une photo. Internet nécessaire pour télécharger Three.js 0.180.0 et three-vrm 3.4.4 au premier import ; aucun envoi du fichier local. Dépendances et rendu WebGL à qualifier sur navigateur réel. Le mode procédural reste disponible.
+
+# V3.2 — Avatar Motion (candidate)
+
+Atelier procédural local : nom, style humanoïde/robot/néon, couleur, morphologie et rotation. Pose neutre sans caméra ; capture réelle MediaPipe normalisée, sans données inventées. Enregistrement de 18 000 images maximum, export JSON et PNG. Pas de modèle GLB riggé, de génération photoréaliste ou de retargeting Blender validé. CI à confirmer.
+
 # NIKO 3D VIBES V3 — NeuroMotion Engine
 
 ## V3.1 — socle partagé et CI
