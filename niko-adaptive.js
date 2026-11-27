@@ -3,6 +3,8 @@ import {angle,clamp} from './niko-native.js';
 export const ADAPTIVE_VERSION='6.2.0';
 export const PRECISION_TUNING=Object.freeze({tau:65,fraction:.18,estimator:'phase_regression'});
 export const SELECTED_TUNING=Object.freeze({tau:65,fraction:.18});
+// Experimental, explicitly opted in; application stays on validated V6.2.
+export const DYNAMIC_TUNING=Object.freeze({tau:65,fraction:.18,estimator:'adaptive_regression'});
 const quantile=(values,q)=>{const a=[...values].sort((x,y)=>x-y),i=(a.length-1)*q,j=Math.floor(i);return a[j]+(a[Math.min(j+1,a.length-1)]-a[j])*(i-j);};
 const median=a=>quantile(a,.5);
 // Fit a common time slope with separate intercepts for left and right phases.
@@ -24,6 +26,22 @@ export function phaseRegression(events,fallback){
  // Reject a disagreement beyond 8%; revert to the pre-existing robust median.
  return Number.isFinite(period)&&Math.abs(period-fallback)<=.08*fallback?period:fallback;
 }
+// Compare recent and older same-phase intervals before evaluating the full window.
+// A consistent new rhythm can reset only the history, never bypass landmark checks.
+export function recentRhythmShift(events){
+ if(!Array.isArray(events)||events.length<9||events.length>32)return false;
+ const periods=[];
+ for(let i=2;i<events.length;i++){
+  const p=events[i],q=events[i-1],r=events[i-2];
+  if(!p||!q||!r||![1,-1].includes(p.phase)||p.phase!==r.phase||p.phase===q.phase||!Number.isFinite(p.t)||!Number.isFinite(q.t)||!Number.isFinite(r.t)||p.t<=q.t||q.t<=r.t)return false;
+  periods.push((p.t-r.t)/2);
+ }
+ const recent=periods.slice(-3),older=periods.slice(0,-3);
+ const now=median(recent),before=median(older);
+ if(!Number.isFinite(now)||!Number.isFinite(before)||now<250||now>1200||before<=0)return false;
+ if(recent.some(x=>Math.abs(x-now)>.08*now))return false;
+ return Math.abs(now-before)>.15*before;
+}
 function characterize(window,fraction){
  const n=window.length;if(n<16)return null;
  const l=window.map(x=>x.l),r=window.map(x=>x.r),d=window.map(x=>x.d);
@@ -36,7 +54,7 @@ function characterize(window,fraction){
  return {center:(hi+lo)/2,threshold:clamp(range*fraction,4,16),correlation:corr};
 }
 export class AdaptiveCadence{
- constructor({tau=65,fraction=.22,estimator='median'}={}){if(![45,65].includes(tau)||![.18,.22].includes(fraction)||!['median','phase_regression'].includes(estimator))throw Error('Unsupported experimental tuning');this.tau=tau;this.fraction=fraction;this.estimator=estimator;this.reset();}
+ constructor({tau=65,fraction=.22,estimator='median'}={}){if(![45,65].includes(tau)||![.18,.22].includes(fraction)||!['median','phase_regression','adaptive_regression'].includes(estimator))throw Error('Unsupported experimental tuning');this.tau=tau;this.fraction=fraction;this.estimator=estimator;this.reset();}
  reset(){this.total=0;this.clearWindow();}
  clearWindow(){this.last=null;this.start=null;this.filtered=null;this.window=[];this.events=[];this.phase=0;this.anchor=null;this.stats=null;this.lastAnalysis=-Infinity;this.reason='warmup';}
  update(p,t,aspect=1){
@@ -66,6 +84,7 @@ export class AdaptiveCadence{
    this.phase=phase;this.anchor=crossing;
   }
   this.events=this.events.filter(v=>v.t>=t-8000).slice(-32);
+  if(this.estimator==='adaptive_regression'&&recentRhythmShift(this.events))this.events=this.events.slice(-5);
   if(t-this.start<6000||this.events.length<5){this.reason='warmup';return null;}
   if(t-this.events.at(-1).t>1200){this.reason='stale';return null;}
   const halves=this.events.slice(1).map((v,i)=>v.t-this.events[i].t);
@@ -73,7 +92,7 @@ export class AdaptiveCadence{
   if(periods.some(x=>!Number.isFinite(x))){this.reason='irregular';return null;}
   const m=median(periods),mad=median(periods.map(x=>Math.abs(x-m)));
   if(mad/m>.12||periods.some(x=>Math.abs(x-m)>.25*m)||halves.some(x=>x<.55*m||x>1.45*m)){this.reason='irregular';return null;}
-  const period=this.estimator==='phase_regression'?phaseRegression(this.events,m):m;
+  const period=this.estimator==='median'?m:phaseRegression(this.events,m);
   const spm=60000/period;if(spm<50||spm>240){this.reason='out_of_range';return null;}
   this.reason='accepted';return spm;
  }
