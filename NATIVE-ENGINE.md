@@ -40,3 +40,6 @@ Adds an optional projected-segment consistency guard using a bounded median hist
 
 ## V6.5 — Application selection candidate
 Research revision 81ed10392edb70c79d3dbcc1af52d42b1f5a53cf passed both CI runs 46005236446 and 46005226827, 90 tests. Across twelve injected-outlier conditions, accepted-estimate mean MAE .0752123 -> .0420999, all 276 gross outliers rejected (baseline rejected zero), coverage 100% -> 95.6190%. Penalized cost increased .0752123 -> 1.3545413 because every rejection incurs 30 units; this is a deliberate rejection/availability trade-off, not across-the-board improvement. Application now selects ROBUST_TUNING and suppresses both knee angles when the geometry guard rejects a frame. Export records the geometry reason. Additional steady-rhythm noninferiority test required. Actual lighting, camera geometry, human occlusion and clinical accuracy remain unvalidated. Activation requires CI and review before merge/deploy.
+
+## V6.5 activation evidence
+Activation 5a006b99c1e619e4b8164e51c20fde33a59861cb: 91/91 tests both runs; 46005477907 full success including browser and WebGL; 46005485231 failed in apt dependency installation due to unrelated Microsoft repository HTTP 403. No code failure reported. CI correction avoids apt on hosted Ubuntu; browser tests remain mandatory. New revision requires its own CI.

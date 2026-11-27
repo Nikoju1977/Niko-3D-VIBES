@@ -19,3 +19,5 @@ La politique LICENSE.md reste inchangée. Les éventuels droits sur les contribu
 - V5.1 : interpolation temporelle des franchissements et estimation sur périodes de même phase; benchmark synthétique déterministe, non clinique.
 
 - V6 : estimateur adaptatif bilatéral par quantiles robustes et corrélation, nouveau module niko-adaptive.js; V5.1 conservé comme référence. Assistance IA ChatGPT, aucun appel Agnes attesté.
+
+- V6.1–V6.5 : recherche classique, régression par phase, détection de changement de rythme, expiration adaptative et rejet géométrique. Assistance IA ChatGPT ; tests synthétiques, aucune exécution matérielle IBM ni invocation Agnes attestée. Notices et licences inchangées.
