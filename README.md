@@ -1,3 +1,7 @@
+# Correctif export vidéo V7.5.1
+
+Le fichier est finalisé en mémoire locale avant téléchargement volontaire ; la vidéo peut être téléchargée de nouveau ou effacée. Le test exige la disponibilité du fichier puis son décodage réel. L'échec intermittent de téléchargement de la V7.5 (workflow 46079322638) reste à revalider avec cette correction.
+
 # V7.5.1 — budget de rendu et endurance (candidate)
 
 Le cycle de rendu ralentit selon le coût CPU mesuré, avec plafonds par profil et réduction de résolution en économie. Les surfaces Canvas immobiles ne sont recalculées qu'après changement de vue. Les commandes de suivi sont invalidées une seule fois après perte de fraîcheur du signal mains/corps ; les commandes manuelles sont indépendantes. Test d'endurance Chromium : 60 secondes de flux caméra simulé, vraie inférence MediaPipe et six changements de mode/profil. Mesure CPU de soumission de rendu, pas mesure GPU ni garantie de température/autonomie. Appareils physiques et plusieurs heures de session restent à tester.
