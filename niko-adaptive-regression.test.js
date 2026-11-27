@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {AdaptiveCadence,SELECTED_TUNING,PRECISION_TUNING,phaseRegression} from './niko-adaptive.js';
+import {AdaptiveCadence,SELECTED_TUNING,PRECISION_TUNING,DYNAMIC_TUNING,phaseRegression} from './niko-adaptive.js';
 const p=(x,y)=>({x,y,visibility:1});
 function rng(seed){let state=seed>>>0;return ()=>{state=(Math.imul(1664525,state)+1013904223)>>>0;return state/4294967296;};}
 function frame(t,c,r){
@@ -45,4 +45,12 @@ test('V6.2 independent synthetic benchmark must improve mean error without cover
  const pos=rows.filter(x=>x.c.mode==='alternating'),average=k=>pos.reduce((a,x)=>a+x[k].mae,0)/pos.length;
  console.log('V62_PRECISION',JSON.stringify({cases:rows.length,baselineMeanMAE:average('base'),candidateMeanMAE:average('candidate'),rows}));
  assert.ok(average('candidate')<average('base'), 'Candidate must actually reduce mean error');
+});
+
+test('V6.3 application selection retains V6.2 precision on all 16 steady rhythm conditions',()=>{
+ for(const [i,rate] of [95,115,145,175].entries())for(const aspect of [1,1.65])for(const noise of [.004,.011]){
+  const c={rate,amp:[12,16,19,21][i],bias:[-9,15,-12,8][i],aspect,noise,mode:'alternating'};
+  const seed=271923+i*100+Math.round(aspect*100)+Math.round(noise*10000),base=trial(c,PRECISION_TUNING,seed),candidate=trial(c,DYNAMIC_TUNING,seed);
+  assert.ok(candidate.coverage>=base.coverage-.01&&candidate.mae<=base.mae+.02,JSON.stringify({c,base,candidate}));
+ }
 });
