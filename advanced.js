@@ -26,7 +26,7 @@ draw(){if(this.mode==='dj'){for(let i=0;i<2;i++){const e=this.dj.decks[i]?.el,s=
  const avatarProject=this.framing(Object.values(f.joints),rot,w,h,'rig:'+profile,Math.max(40,PROFILES[profile].radius*110+12));if(!avatarProject)return;
  c.lineCap='round';c.strokeStyle=PROFILES[profile].color;c.lineWidth=PROFILES[profile].radius*220;
  for(const b of f.bones){c.beginPath();c.moveTo(...avatarProject(f.joints[b.parent]));c.lineTo(...avatarProject(f.joints[b.name]));c.stroke();}
- c.fillStyle='#f5f3ff';for(const p of Object.values(f.joints)){c.beginPath();c.arc(...avatarProject(p),5,0,Math.PI*2);c.fill();}
+ c.fillStyle='#f5f3ff';for(const p of Object.values(f.joints)){c.beginPath();const q=avatarProject(p);if(!q)continue;c.arc(q[0],q[1],5,0,Math.PI*2);c.fill();}
  c.lineCap='butt';label('NIKO AVATAR · '+PROFILES[profile].label.toUpperCase());label('Rotations directionnelles · non anatomiques',h-16);return
 }let f=this.latest;if(!f){label('SQUELETTE · EN ATTENTE');return}let pts=f.points;if(f.space==='image_relative'){let root=pts[23]||pts[24];if(root)pts=pts.map(p=>p&&p.map((v,i)=>v-root[i]))}const centered=this.framing(pts,rot,w,h,'landmarks:'+f.space);if(!centered)return;c.strokeStyle='#56e6ce';c.lineWidth=3;for(let [a,b] of BONES){if(!pts[a]||!pts[b])continue;c.beginPath();c.moveTo(...centered(pts[a]));c.lineTo(...centered(pts[b]));c.stroke()}c.fillStyle='#ffbd75';for(let p of pts){if(!p)continue;c.beginPath();const q=centered(p);if(!q)continue;c.arc(q[0],q[1],4,0,Math.PI*2);c.fill()}label(f.space==='image_relative'?'REPÈRES IMAGE · PROFONDEUR RELATIVE':'REPÈRES 3D ESTIMÉS · ORIGINE HANCHES');label(`${this.capture.frames.length} images capturées`,h-16)}
 }
