@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {handFeatures,classify,NikoGesture,AdaptiveAxis} from './niko-gesture.js';
+import {handFeatures,classify,NikoGesture,AdaptiveAxis,HoloGrip} from './niko-gesture.js';
 import {HandTracker} from './neuro.js';
 function hand(flags=[true,true,true,true]){
  const p=Array.from({length:21},()=>({x:.5,y:.65,z:0}));p[0]={x:.5,y:.8,z:0};
@@ -37,4 +37,25 @@ test('new recognizer is selectable via tracker; default native tracker',()=>{
  h.update([hand()],[],0);assert.equal(h.update([hand()],[],150).primary.g.gesture,'OPEN');
  assert.equal(h.update([],[],200).primary,undefined);
  assert.equal(handFeatures([{x:0,y:0}]),null);
+});
+
+
+function gripAt(offset,pinch=true){const p=hand();if(pinch)p[4]={...p[8]};return p.map(v=>({...v,x:v.x+offset}));}
+test('two-hand grip acquires relative zoom without jumping, then scales smoothly',()=>{
+ const g=new HoloGrip(),pair=(d)=>[gripAt(-d/2),gripAt(d/2)];
+ assert.equal(g.update(pair(.3),0,1,1.3),null);
+ assert.equal(g.update(pair(.3),60,1,1.3),null);
+ assert.equal(g.update(pair(.3),120,1,1.3),1.3);
+ const z=g.update(pair(.45),220,1,1.3);assert.ok(z>1.3&&z<1.95);
+ for(let t=320;t<=1220;t+=100)assert.ok(g.update(pair(.6),t,1,1.3)<=2);
+});
+test('release, gaps, reordered hands and invalid landmarks cannot jump the zoom',()=>{
+ const g=new HoloGrip(),pair=[gripAt(-.15),gripAt(.15)];
+ g.update(pair,0,1,1.6);assert.equal(g.update(pair,120,1,1.6),1.6);
+ assert.equal(g.update([...pair].reverse(),180,1,1.6),1.6);
+ assert.equal(g.update([pair[0],gripAt(.15,false)],220,1,1.6),null);
+ assert.equal(g.update(pair,240,1,.8),null);assert.equal(g.update(pair,360,1,.8),.8);
+ assert.equal(g.update(pair,900,1,.8),null);
+ assert.equal(g.update([[],[]],920,1,.8),null);
+ assert.equal(g.update(pair,940,NaN,.8),null);
 });
