@@ -7,6 +7,8 @@ export const SELECTED_TUNING=Object.freeze({tau:65,fraction:.18});
 export const DYNAMIC_TUNING=Object.freeze({tau:65,fraction:.18,estimator:'adaptive_regression'});
 // V6.4 application candidate; earlier tuning retained for reproducibility.
 export const FRESHNESS_TUNING=Object.freeze({tau:65,fraction:.18,estimator:'freshness_regression'});
+// Research only: no substitution or interpolation of missing landmarks.
+export const ROBUST_TUNING=Object.freeze({tau:65,fraction:.18,estimator:'robust_vision'});
 const quantile=(values,q)=>{const a=[...values].sort((x,y)=>x-y),i=(a.length-1)*q,j=Math.floor(i);return a[j]+(a[Math.min(j+1,a.length-1)]-a[j])*(i-j);};
 const median=a=>quantile(a,.5);
 // Fit a common time slope with separate intercepts for left and right phases.
@@ -56,14 +58,30 @@ function characterize(window,fraction){
  return {center:(hi+lo)/2,threshold:clamp(range*fraction,4,16),correlation:corr};
 }
 export class AdaptiveCadence{
- constructor({tau=65,fraction=.22,estimator='median'}={}){if(![45,65].includes(tau)||![.18,.22].includes(fraction)||!['median','phase_regression','adaptive_regression','freshness_regression'].includes(estimator))throw Error('Unsupported experimental tuning');this.tau=tau;this.fraction=fraction;this.estimator=estimator;this.reset();}
+ constructor({tau=65,fraction=.22,estimator='median'}={}){if(![45,65].includes(tau)||![.18,.22].includes(fraction)||!['median','phase_regression','adaptive_regression','freshness_regression','robust_vision'].includes(estimator))throw Error('Unsupported experimental tuning');this.tau=tau;this.fraction=fraction;this.estimator=estimator;this.reset();}
  reset(){this.total=0;this.clearWindow();}
- clearWindow(){this.last=null;this.start=null;this.filtered=null;this.window=[];this.events=[];this.phase=0;this.anchor=null;this.stats=null;this.lastAnalysis=-Infinity;this.reason='warmup';}
+ clearWindow(){this.last=null;this.start=null;this.filtered=null;this.window=[];this.events=[];this.phase=0;this.anchor=null;this.stats=null;this.lastAnalysis=-Infinity;this.reason='warmup';this.geometry=[];this.geometryAspect=null;}
  update(p,t,aspect=1){
   if(!Array.isArray(p)||p.length!==33||!Number.isFinite(t)||t<0||!Number.isFinite(aspect)){this.clearWindow();this.reason='invalid_frame';return null;}
   const l=angle(p[23],p[25],p[27],aspect),r=angle(p[24],p[26],p[28],aspect);
   if(l===null||r===null){this.clearWindow();this.reason='invalid_landmarks';return null;}
   if(this.last!==null&&(t<=this.last||t-this.last>160)){this.clearWindow();this.reason='sampling_gap';return null;}
+  if(this.estimator==='robust_vision'){
+   // Projected segment lengths are not anatomical measurements. This guard only
+   // rejects abrupt departures from recent valid geometry; gradual change is allowed.
+   if(this.geometryAspect!==null&&Math.abs(aspect/this.geometryAspect-1)>.02){this.clearWindow();this.reason='geometry_changed';return null;}
+   const lengths=[[23,25],[25,27],[24,26],[26,28]].map(([i,j])=>Math.hypot((p[i].x-p[j].x)*aspect,p[i].y-p[j].y));
+   if(lengths.some(v=>!Number.isFinite(v)||v<1e-5)){this.clearWindow();this.reason='geometry_invalid';return null;}
+   if(this.geometry.length>=9){
+    const refs=lengths.map((_,i)=>median(this.geometry.map(g=>g[i])));
+    if(lengths.some((v,i)=>v<.55*refs[i]||v>1.65*refs[i])){
+     // No estimate for this frame; leave the last accepted timestamp untouched.
+     // Existing >160 ms continuity rule resets the entire window for longer gaps.
+     this.reason='geometry_outlier';return null;
+    }
+   }
+   this.geometryAspect=aspect;this.geometry.push(lengths);if(this.geometry.length>21)this.geometry.shift();
+  }
   const prev=this.filtered,dt=this.last===null?0:t-this.last;this.last=t;if(this.start===null)this.start=t;
   this.filtered=prev===null?l-r:prev+(1-Math.exp(-dt/this.tau))*(l-r-prev);
   this.window.push({t,l,r,d:this.filtered});
@@ -86,7 +104,7 @@ export class AdaptiveCadence{
    this.phase=phase;this.anchor=crossing;
   }
   this.events=this.events.filter(v=>v.t>=t-8000).slice(-32);
-  if(['adaptive_regression','freshness_regression'].includes(this.estimator)&&recentRhythmShift(this.events))this.events=this.events.slice(-5);
+  if(['adaptive_regression','freshness_regression','robust_vision'].includes(this.estimator)&&recentRhythmShift(this.events))this.events=this.events.slice(-5);
   if(t-this.start<6000||this.events.length<5){this.reason='warmup';return null;}
   if(t-this.events.at(-1).t>1200){this.reason='stale';return null;}
   const halves=this.events.slice(1).map((v,i)=>v.t-this.events[i].t);
@@ -95,7 +113,7 @@ export class AdaptiveCadence{
   const m=median(periods),mad=median(periods.map(x=>Math.abs(x-m)));
   // Expire the last estimate relative to observed cycle length, not only a fixed timeout.
   // A new estimate requires five fresh events after expiry; no old timestamps are reused.
-  if(this.estimator==='freshness_regression'&&t-this.events.at(-1).t>clamp(1.65*m,380,1200)){
+  if(['freshness_regression','robust_vision'].includes(this.estimator)&&t-this.events.at(-1).t>clamp(1.65*m,380,1200)){
    this.events=[];this.phase=0;this.anchor=null;this.reason='rhythm_expired';return null;
   }
   if(mad/m>.12||periods.some(x=>Math.abs(x-m)>.25*m)||halves.some(x=>x<.55*m||x>1.45*m)){this.reason='irregular';return null;}
