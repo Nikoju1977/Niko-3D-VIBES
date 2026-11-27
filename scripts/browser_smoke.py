@@ -10,7 +10,7 @@ server = ThreadingHTTPServer(('127.0.0.1', 0), partial(SimpleHTTPRequestHandler,
 Thread(target=server.serve_forever, daemon=True).start()
 try:
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        browser = p.chromium.launch(args=['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
         for viewport in [{'width':1280,'height':800},{'width':390,'height':844}]:
             page = browser.new_page(viewport=viewport, accept_downloads=True)
             errors=[]
@@ -29,6 +29,21 @@ try:
             for mode in ['bio','robot','sound','cinema','dj','art','twin','agent','mocap','holo']:
                 btn=page.locator(f'[data-mode={mode}]');btn.click()
                 assert btn.get_attribute('aria-pressed')=='true', mode
+            page.locator('#renderer').select_option('gpu')
+            page.wait_for_function("document.getElementById('rendererStatus').textContent === 'WebGL 2 · actif'")
+            # Actual shader draw/readback on CI software WebGL, not physical GPU.
+            pixels = page.evaluate("""async () => {
+                const {SpatialRenderer}=await import('./niko-spatial.js');
+                const canvas=document.createElement('canvas'),r=new SpatialRenderer(canvas);
+                const ok=r.draw([{color:'#ff0000',dir:[0,0,0],points:[[0,0,0]]}],{yaw:0,pitch:0,zoom:1,explode:0},128,128,1);
+                const pixel=new Uint8Array(4);r.gl.readPixels(64,64,1,1,r.gl.RGBA,r.gl.UNSIGNED_BYTE,pixel);r.dispose();
+                return {ok,pixel:[...pixel]};
+            }""")
+            assert pixels['ok'] and pixels['pixel'][0] > 200 and pixels['pixel'][1] < 30, pixels
+            page.evaluate("document.querySelector('.spatial-gpu').dispatchEvent(new Event('webglcontextlost',{cancelable:true}))")
+            page.wait_for_function("document.getElementById('rendererStatus').textContent === 'Canvas 2D · repli GPU'")
+            page.locator('#renderer').select_option('cpu')
+            print('Spatial: WebGL2 shader readback and context-loss fallback OK')
             page.locator('[data-mode=art]').click()
             canvas=page.locator('#advCanvas');canvas.scroll_into_view_if_needed();box=canvas.bounding_box()
             x,y=box['x']+box['width']*.4,box['y']+box['height']*.4

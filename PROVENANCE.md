@@ -7,3 +7,5 @@
 - Les modèles MediaPipe restent des dépendances tierces et ne sont pas des modèles Studio Niko.
 
 La politique LICENSE.md reste inchangée. Les éventuels droits sur les contributions nouvelles sont réservés dans la mesure où ils existent effectivement. Les droits MIT préexistants demeurent intacts. Pas de revendication d'invention brevetée ni de paternité exclusive sur les méthodes mathématiques générales. Une analyse indépendante est nécessaire avant une revendication juridique de réimplémentation intégrale.
+
+- niko-spatial.js : nouveau module de rendu WebGL2, géométrie procédurale historique réutilisée; aucune prétention de réimplémentation intégrale indépendante.

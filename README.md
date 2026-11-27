@@ -68,3 +68,6 @@ Voir [PRECISION-CORE.md](PRECISION-CORE.md) : évaluation comparative locale et 
 
 ### Precision Core 1.1 (extension expérimentale)
 Budget d'incertitude, rapport d'étalonnage avec jeu de validation déclaré distinct, empreinte SHA-256. Aucune correction automatique. Voir PRECISION-CORE.md.
+
+### Spatial Engine 1.0
+Rendu natif WebGL2 optionnel du mode Holo, secours Canvas. Voir SPATIAL-ENGINE.md. Aucune mesure clinique dérivée du rendu.
