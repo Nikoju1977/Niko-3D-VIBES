@@ -1,7 +1,7 @@
 // Studio Niko Design — V5 experimental native motion runtime.
 // General vector geometry and bilateral knee-phase crossings; non-clinical.
 import {NikoGesture} from './niko-gesture.js';
-export const NATIVE_VERSION='5.0.0';
+export const NATIVE_VERSION='5.1.0';
 export {NikoGesture as Gesture};
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 // Connections describe the third-party MediaPipe landmark convention.
@@ -18,28 +18,37 @@ const median=values=>{const a=[...values].sort((x,y)=>x-y),i=Math.floor(a.length
 export class Cadence{
  constructor(){this.reset();}
  reset(){this.total=0;this.clearWindow();}
- clearWindow(){this.last=null;this.start=null;this.phase=0;this.anchor=null;this.events=[];this.filtered=null;}
+ clearWindow(){this.last=null;this.start=null;this.phase=0;this.anchor=null;this.events=[];this.filtered=null;this.reason='warmup';}
  update(p,t,aspect=1){
-  if(!Array.isArray(p)||p.length!==33||!Number.isFinite(t)||t<0||!Number.isFinite(aspect)){this.clearWindow();return null;}
+  if(!Array.isArray(p)||p.length!==33||!Number.isFinite(t)||t<0||!Number.isFinite(aspect)){this.clearWindow();this.reason='invalid_frame';return null;}
   const l=angle(p[23],p[25],p[27],aspect),r=angle(p[24],p[26],p[28],aspect);
-  if(l===null||r===null){this.clearWindow();return null;}
-  if(this.last!==null&&(t<=this.last||t-this.last>500)){this.clearWindow();return null;}
-  const d=l-r,dt=this.last===null?0:t-this.last;this.last=t;if(this.start===null)this.start=t;
-  this.filtered=this.filtered===null?d:this.filtered+(1-Math.exp(-dt/65))*(d-this.filtered);
+  if(l===null||r===null){this.clearWindow();this.reason='invalid_landmarks';return null;}
+  // Refuse undersampled intervals: at 240 alternations/min a half-cycle is 250 ms.
+  if(this.last!==null&&(t<=this.last||t-this.last>160)){this.clearWindow();this.reason='sampling_gap';return null;}
+  const d=l-r,previous=this.filtered,dt=this.last===null?0:t-this.last;this.last=t;if(this.start===null)this.start=t;
+  this.filtered=previous===null?d:previous+(1-Math.exp(-dt/65))*(d-previous);
   const phase=this.filtered>=12?1:this.filtered<=-12?-1:0;
   if(phase&&phase!==this.phase){
+   const threshold=phase*12;
+   const crossing=previous===null||dt===0||Math.abs(this.filtered-previous)<1e-8?t:t-dt+dt*clamp((threshold-previous)/(this.filtered-previous),0,1);
    if(this.phase){
-    const interval=t-this.anchor;
-    if(interval>=250&&interval<=1200){this.events.push(t);this.total++;}
+    const interval=crossing-this.anchor;
+    if(interval>=250&&interval<=1200){this.events.push({t:crossing,phase});this.total++;}
     else this.events=[];
    }
-   this.phase=phase;this.anchor=t;
+   this.phase=phase;this.anchor=crossing;
   }
-  this.events=this.events.filter(v=>v>=t-8000).slice(-32);
-  if(t-this.start<6000||this.events.length<5||t-this.events.at(-1)>1200)return null;
-  const intervals=this.events.slice(1).map((v,i)=>v-this.events[i]),m=median(intervals),mad=median(intervals.map(x=>Math.abs(x-m)));
-  if(mad/m>.15||intervals.some(x=>Math.abs(x-m)>.30*m))return null;
-  const spm=60000/m;return spm>=50&&spm<=240?spm:null;
+  this.events=this.events.filter(v=>v.t>=t-8000).slice(-32);
+  if(t-this.start<6000||this.events.length<5){this.reason='warmup';return null;}
+  if(t-this.events.at(-1).t>1200){this.reason='stale';return null;}
+  // Same-phase periods reduce bias from unequal left/right half-cycle lengths.
+  const halves=this.events.slice(1).map((v,i)=>v.t-this.events[i].t);
+  const cycles=this.events.slice(2).map((v,i)=>v.phase===this.events[i].phase?(v.t-this.events[i].t)/2:NaN);
+  if(cycles.some(x=>!Number.isFinite(x))){this.reason='irregular';return null;}
+  const m=median(cycles),mad=median(cycles.map(x=>Math.abs(x-m)));
+  if(mad/m>.12||cycles.some(x=>Math.abs(x-m)>.25*m)||halves.some(x=>x<.55*m||x>1.45*m)){this.reason='irregular';return null;}
+  const spm=60000/m;if(spm<50||spm>240){this.reason='out_of_range';return null;}
+  this.reason='accepted';return spm;
  }
 }
 // UI compatibility commands only: virtual robot, no physical actuation.

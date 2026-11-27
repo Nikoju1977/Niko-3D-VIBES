@@ -124,7 +124,7 @@ try:
             }""", envelope)
             assert decrypted['clinical_validation'] is False
             assert decrypted['precision_core'] == '1.0.0'
-            assert decrypted['native_engine'] == '5.0.0'
+            assert decrypted['native_engine'] == '5.1.0'
             assert page.locator('#exportPassword').input_value() == ''
             assert not errors, errors
             # V10 comparison with the same application scripts and two CSS variants.
