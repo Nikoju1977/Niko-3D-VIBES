@@ -1,3 +1,7 @@
+# V7 Studio — candidate
+
+Refonte du poste de création, guide contextuel, accès directs et agrandissement. Holo utilise un nouveau maillage surfacique ombré (Canvas 2D) par défaut ; le moteur de points WebGL V6.5 reste disponible. Les moteurs natifs, garde-fous cliniques, licences et intégrité sont conservés. Version candidate à valider.
+
 # NIKO 3D VIBES — V6.5 Robust Vision (candidat)
 
 Studio Niko Design · PWA créative et analyse expérimentale du mouvement. **Non médical.**

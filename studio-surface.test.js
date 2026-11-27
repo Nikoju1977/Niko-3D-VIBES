@@ -1,0 +1,3 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {geometry,tube,shaded} from './studio-surface.js';
+test('all original models have closed or hollow face meshes with finite positions',()=>{for(const [n,k] of [['engine',5],['camera',4],['joint',4]]){const g=geometry(n);assert.equal(g.length,k);assert.ok(g.flat(3).every(Number.isFinite));}assert.equal(tube(1,0,2,.5,20).length,80);});
+test('surface shading is bounded CSS RGB',()=>{const s=shaded([[0,0,0],[1,0,0],[0,1,0]],'#56e6ce');assert.match(s,/^rgb\(\d+,\d+,\d+\)$/);assert.ok(s.match(/\d+/g).every(v=>+v>=0&&+v<=255));});
