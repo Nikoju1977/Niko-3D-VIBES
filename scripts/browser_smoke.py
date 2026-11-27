@@ -1,5 +1,6 @@
 """Real browser UI smoke test (no camera/model inference). Run with Playwright installed."""
 from pathlib import Path
+import json
 from functools import partial
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from threading import Thread
@@ -35,6 +36,17 @@ try:
             with page.expect_download() as info: page.locator('#artExport').click()
             data=Path(info.value.path()).read_text();assert '\nv ' in data and '\nl ' in data
             page.locator('#stop').click();assert 'ARRÊTÉ' in page.locator('#status').inner_text()
+            page.locator('#exportPassword').fill('synthetic browser passphrase')
+            with page.expect_download() as encrypted: page.locator('#exportEncrypted').click()
+            envelope = json.loads(Path(encrypted.value.path()).read_text())
+            assert envelope['cipher'] == 'AES-256-GCM' and 'measurements' not in envelope
+            decrypted = page.evaluate("""async envelope => {
+                const {decryptSession}=await import('./niko-precision-core.js');
+                return JSON.parse(await decryptSession(envelope,'synthetic browser passphrase'));
+            }""", envelope)
+            assert decrypted['clinical_validation'] is False
+            assert decrypted['precision_core'] == '1.0.0'
+            assert page.locator('#exportPassword').input_value() == ''
             assert not errors, errors
 
             # V10 comparison with the same application scripts and two CSS variants.

@@ -15,3 +15,6 @@ Statut : prototype de recherche et création, non destiné à un usage médical.
 - Si destination médicale: analyse réglementaire MDR 2017/745, qualification/classification et évaluation clinique selon MDCG 2020-1; mise en service médicale bloquée tant que preuves et exigences applicables non satisfaites.
 
 Aucune revendication de sécurité absolue ni de précision médicale. Les tests de cette branche sont synthétiques et UI, sans patients ni système de référence.
+
+## Complément Precision Core 1.0
+Export chiffré optionnel de la session biomécanique, JSON ordinaire et autres exports non chiffrés. Banc de référence local avec critères explicites. Voir PRECISION-CORE.md. Aucun patient, audit indépendant ni preuve clinique.

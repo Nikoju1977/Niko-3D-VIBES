@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node --test *.test.js",
     "start": "python3 -m http.server 8000",
-    "check": "node --check app.js && node --check advanced.js && node --check engine.js && node --check scene.js && node --check motion.js && node --check dj.js && node --check sw.js && node --check vision-client.js && node --check vision-worker.js && node --check vision-models.js && node --check neuro.js && node --check studio-niko-core.js && node --check core-diagnostic.js && node --check niko-gesture.js && node --check niko-measurement-quality.js",
-    "build": "node scripts/build.mjs"
+    "check": "node --check app.js && node --check advanced.js && node --check engine.js && node --check scene.js && node --check motion.js && node --check dj.js && node --check sw.js && node --check vision-client.js && node --check vision-worker.js && node --check vision-models.js && node --check neuro.js && node --check studio-niko-core.js && node --check core-diagnostic.js && node --check niko-gesture.js && node --check niko-measurement-quality.js && node --check niko-precision-core.js && node --check scripts/precision-reference.mjs",
+    "build": "node scripts/build.mjs",
+    "precision:reference": "node scripts/precision-reference.mjs"
   }
 }

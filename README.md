@@ -62,3 +62,6 @@ Choisir le moteur NIKO Gesture V4 dans la barre des commandes. Reconnaissance pa
 
 ### Contrôle qualité V4
 Voir [MEDICAL-QUALITY-SECURITY.md](MEDICAL-QUALITY-SECURITY.md). Mesures rejetées si signal insuffisant, cadence conditionnée à la continuité, exports non calibrés explicitement identifiés. Non médical et non certifié.
+
+### Precision Core 1.0
+Voir [PRECISION-CORE.md](PRECISION-CORE.md) : évaluation comparative locale et export de session chiffré optionnel. Pas de validation clinique.
