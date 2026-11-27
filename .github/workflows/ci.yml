@@ -29,6 +29,7 @@ jobs:
       # Browser smoke tests remain mandatory and fail if runtime libraries are absent.
       - run: python -m playwright install chromium
       - run: python scripts/browser_smoke.py
+      - run: python scripts/framing_smoke.py
       - run: python scripts/webgl_smoke.py
       - run: python scripts/startup_smoke.py
       - run: python scripts/media_smoke.py

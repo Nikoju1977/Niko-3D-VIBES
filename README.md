@@ -1,3 +1,7 @@
+# V7.6 — cadrage des squelettes (candidate)
+
+Digital Twin, Motion Capture et avatar procédural : projection par boîte englobante après rotation, centrage et marges, réduction immédiate en cas de pose large, agrandissement progressif. Les données de capture/export et mesures ne sont pas modifiées. La superposition caméra conserve la position réelle des repères, avec correction des bandes noires et miroir. Tests unitaires de projection et vérification des pixels du canvas sur deux tailles d'écran avec repères synthétiques injectés uniquement pendant les tests. Caméra physique non testée.
+
 # Correctif export vidéo V7.5.1
 
 Le fichier est finalisé en mémoire locale avant téléchargement volontaire ; la vidéo peut être téléchargée de nouveau ou effacée. Le test exige la disponibilité du fichier puis son décodage réel. L'échec intermittent de téléchargement de la V7.5 (workflow 46079322638) reste à revalider avec cette correction.
