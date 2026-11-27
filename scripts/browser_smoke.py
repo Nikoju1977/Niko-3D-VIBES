@@ -28,6 +28,11 @@ try:
             for mode in ['bio','robot','sound','cinema','dj','art','twin','agent','mocap','avatar','holo']:
                 btn=page.locator(f'[data-mode={mode}]');btn.click()
                 assert btn.get_attribute('aria-pressed')=='true', mode
+            page.locator('[data-open-mode=avatar]').click()
+            assert page.locator('#studioModeTitle').inner_text()=='Avatar Motion Studio'
+            page.locator('#studioFocus').click()
+            assert page.locator('#studioFocus').get_attribute('aria-pressed')=='true'
+            page.locator('#studioFocus').click()
             page.locator('[data-mode=twin]').click()
             page.locator('#twinRig').select_option('avatar')
             page.wait_for_function("document.getElementById('twinAvatarStatus').textContent === 'Avatar : signal 3D insuffisant'")

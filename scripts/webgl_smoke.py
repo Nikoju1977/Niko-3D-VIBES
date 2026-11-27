@@ -41,6 +41,18 @@ try:
         expect(page.locator('#realAvatarStage canvas')).to_be_visible()
         page.locator('#realAvatarClear').click()
         expect(page.locator('#realAvatarStage')).to_be_hidden()
+        # Deterministic generated motion fixture; validates actual GLB animation playback, not camera capture.
+        fixture=page.evaluate("""async()=>{const {retargetAvatar}=await import('/niko-avatar.js');const {MotionTake,exportMotionGLB}=await import('/niko-motion-studio.js');const p=Array(33).fill(null),coords={0:[0,-.8,0],11:[.2,-.5,0],12:[-.2,-.5,0],13:[.5,-.5,0],14:[-.5,-.5,0],15:[.7,-.5,0],16:[-.7,-.5,0],23:[.12,0,0],24:[-.12,0,0],25:[.12,.4,0],26:[-.12,.4,0],27:[.12,.8,0],28:[-.12,.8,0]};for(const [i,[x,y,z]] of Object.entries(coords))p[i]={x,y,z,visibility:1};const t=new MotionTake();t.begin('robot');for(let i=0;i<11;i++){p[15]={x:.7-i*.02,y:-.5+i*.025,z:0,visibility:1};t.add(retargetAvatar(p),i*100);}t.stop();return Array.from(exportMotionGLB(t.data()));}""")
+        page.locator('#realAvatarFile').set_input_files({'name':'motion-fixture.glb','mimeType':'model/gltf-binary','buffer':bytes(fixture)})
+        expect(page.locator('#assetPlay')).to_be_enabled(timeout=60000)
+        page.locator('#assetPlay').click()
+        expect(page.locator('#assetPlay')).to_have_text('Pause')
+        page.wait_for_function("Number(document.getElementById('assetSeek').value)>0")
+        page.locator('#assetPlay').click()
+        page.locator('#assetReset').click()
+        expect(page.locator('#assetSeek')).to_have_value('0')
+        page.locator('#realAvatarClear').click()
+        expect(page.locator('#assetPlay')).to_be_disabled()
         # Official public MediaPipe test portrait; never use a user's private photo.
         with urlopen('https://storage.googleapis.com/mediapipe-assets/portrait.jpg', timeout=30) as response:
             portrait=response.read(5*1024*1024)
