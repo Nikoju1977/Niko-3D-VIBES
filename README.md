@@ -1,3 +1,19 @@
+# V8.1 Avatar Intelligence — candidat
+
+[Guide des moteurs locaux](tools/AVATAR_INTELLIGENCE.md) · [Bridge Python](tools/generate_3d.py) · [Tests](tools/test_generate_3d.py). Deux chemins de génération véritables, conditionnés par l'installation externe de TripoSR (photo vers maillage, atlas optionnel) ou Shap-E (texte vers maillage). Export GLB autonome, validation de base, aucun écrasement d'un modèle existant. L'interface donne accès aux outils et à l'import existant ; elle n'exécute pas le calcul Python. Aucun rig automatique ni photoréalisme garanti. CI hors ligne ajoutée ; aucune génération GPU exécutée. Le moteur web reste gratuit, sans clé supplémentaire.
+
+# V8 Cinematic Avatar — candidat
+
+Ajout d'un filtre adaptatif temporel pour les repères corporels affichés (les exports restent inchangés), rejet des repères manquants et réinitialisation après interruption. Le suivi facial refuse les inférences dépassant 500 ms et réinitialise les expressions si le flux ne fournit plus de signal récent pendant 750 ms. Cinq éclairages WebGL, dont film noir et néon, et plafonds de résolution de rendu selon le profil (0,6 / 1,2 / 2,4 millions de pixels ciblés). Cadrage automatique des transformations locales. Guide pour le suivi simultané du corps et des expressions sur VRM compatible, non validé sur caméra physique. Les créatures sont procédurales, le portrait texturé est une surface faciale estimée et le photoréalisme dépend des modèles importés. Aucune IA générative 3D nouvelle, aucun service payant. Tests du filtre ajoutés, CI et validation visuelle requises avant fusion.
+
+# V7.6.1 — cadrage automatique (candidat)
+
+Cadrage visuel par enveloppe des repères projetés, marges et conservation des proportions pour Digital Twin, Motion Capture et avatar procédural. Les coordonnées enregistrées restent inchangées. Import GLB/VRM : normalisation sur la dimension maximale et cadrage tenant compte du champ horizontal et vertical ; nouveau cadrage lors d’un changement important de ratio. Les anciens repères sont effacés au changement d’atelier, et la capture Motion Capture cesse à sa sortie. Tests géométriques synthétiques ajoutés ; validation navigateur, caméra réelle et CI encore requises. Aucun changement de licence ou service payant.
+
+# Holo OS V7.6 — candidat
+
+Branche expérimentale indépendante, inspirée des interfaces spatiales publiques, sans incorporation de code Augma. Zoom relatif par pincement des deux mains, contrôle gestuel désactivable, rejet des inférences dont le délai dépasse 500 ms et invalidation lors des changements d’atelier. Guide intégré et lanceur vers cinq outils Studio Niko : liens externes seulement, sans exécution des agents ni partage automatique de données. Le cache PWA change de version. Les onze ateliers historiques sont conservés. Les tests synthétiques du zoom sont ajoutés ; CI, disponibilité des liens externes et essais physiques restent à confirmer. Aucun service payant ni nouvelle clé API.
+
 # Correctif export vidéo V7.5.1
 
 Le fichier est finalisé en mémoire locale avant téléchargement volontaire ; la vidéo peut être téléchargée de nouveau ou effacée. Le test exige la disponibilité du fichier puis son décodage réel. L'échec intermittent de téléchargement de la V7.5 (workflow 46079322638) reste à revalider avec cette correction.

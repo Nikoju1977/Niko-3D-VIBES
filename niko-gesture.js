@@ -63,3 +63,24 @@ export class NikoGesture{
   return {gesture:this.stable,confidence:this.stable==='NONE'?0:c.confidence,pinch:this.stable==='PINCH',open:this.open.update(f.open,t),x:this.x.update(f.x,t),y:this.y.update(f.y,t),roll:f.roll};
  }
 }
+
+
+/** Relative two-hand zoom. No jumps on acquisition or loss; both hands must pinch. */
+export class HoloGrip {
+ constructor(){this.reset();}
+ reset(){this.base=null;this.last=null;this.since=null;this.value=null;}
+ update(hands,t,aspect,zoom){
+  if(!Array.isArray(hands)||hands.length!==2||!Number.isFinite(t)||!Number.isFinite(aspect)||aspect<=0||!Number.isFinite(zoom)){this.reset();return null;}
+  const f=hands.map(h=>handFeatures(h,aspect));
+  if(f.some(h=>!h||h.pinch<.75)){this.reset();return null;}
+  const distance=Math.hypot((f[0].x-f[1].x)*aspect,f[0].y-f[1].y);
+  if(!Number.isFinite(distance)||distance<.08){this.reset();return null;}
+  if(this.last===null||t<=this.last||t-this.last>350){this.reset();this.since=t;this.last=t;return null;}
+  const dt=t-this.last;this.last=t;
+  if(t-this.since<120)return null;
+  if(!this.base){this.base={distance,zoom:bound(zoom,.5,2)};this.value=this.base.zoom;return this.value;}
+  const target=bound(this.base.zoom*distance/this.base.distance,.5,2);
+  this.value+= (target-this.value)*(1-Math.exp(-dt/90));
+  return bound(this.value,.5,2);
+ }
+}

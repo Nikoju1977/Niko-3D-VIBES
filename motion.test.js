@@ -1,4 +1,4 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';import {Capture,Agent,Art,descriptor,distance,poseFrame,cameraFrame} from './motion.js';
+import {test} from 'node:test';import assert from 'node:assert/strict';import {Capture,Agent,Art,descriptor,distance,poseFrame,cameraFrame,fitPoseProjection} from './motion.js';
 const pose=()=>Array.from({length:33},(_,i)=>({x:i/40,y:i/50,z:.1,visibility:1}));
 test('capture respects rate, origin, size, and coordinate space',()=>{let c=new Capture(2);c.begin(null);assert.equal(c.add(null,50),false);assert.equal(c.add(pose(),100,1,true),true);assert.equal(c.add(pose(),120,1,true),false);assert.equal(c.add(pose(),200,1,false),false);assert.equal(c.add(pose(),200,1,true),true);assert.equal(c.add(pose(),300,1,true),false);assert.equal(c.recording,false);assert.deepEqual(c.data().frames.map(f=>f.t_ms),[0,100]);assert.equal(c.data().space,'mediapipe_world_estimated_m')});
 test('pose masks occluded joints and validates input',()=>{let p=pose();p[2].visibility=.2;assert.equal(poseFrame(p,10).points[2],null);assert.equal(poseFrame([],10),null)});
@@ -7,3 +7,19 @@ test('agent needs stable samples, dwell, cooldown, and release',()=>{let a=new A
 test('agent rejects ambiguous templates and unstable samples',()=>{let a=new Agent(),v=Array(63).fill(0),w=Array(63).fill(1);assert.equal(a.learn('bad','next',[v,v,v,v,w]),false);a.learn('a','next',[v,v,v,v,v]);a.learn('b','center',[v,v,v,v,v]);a.update(v,0);assert.equal(a.update(v,900),null)});
 test('OBJ export indexes vertices and supports undo',()=>{let a=new Art();a.add(0,0,0,'#fff');a.add(1,1,1,'#fff');a.end();a.add(0,1,0,'#000');assert.match(a.obj(),/l 1 2\np 3/);a.undo();assert.equal(a.count,2);assert.doesNotMatch(a.obj(),/p 3/);a.clear();assert.equal(a.count,0)});
 test('camera bounds and timestamp',()=>{assert.equal(cameraFrame(null,0),null);assert.deepEqual(cameraFrame({x:.5,y:.5,open:2},12),{t_ms:12,yaw:0,pitch:0,focal_mm:85})});
+
+
+test('viewport fit centers all visible joints in landscape, portrait and ultrawide',()=>{
+ const pts=[[-1,1,0],[1,1,0],[-.3,-1,0],[.3,-1,0],[0,2,.4],null];
+ for(const [w,h] of [[640,420],[300,600],[900,240]])for(const yaw of [-Math.PI/2,0,Math.PI/3])for(const perspective of [true,false]){
+  const project=fitPoseProjection(pts,w,h,{yaw,perspective}),q=pts.filter(Boolean).map(project);
+  assert.ok(q.every(p=>p[0]>=35.999&&p[0]<=w-35.999&&p[1]>=35.999&&p[1]<=h-35.999));
+  for(let i=0;i<2;i++)assert.ok(Math.abs((Math.min(...q.map(p=>p[i]))+Math.max(...q.map(p=>p[i])))/2-[w,h][i]/2)<1e-8);
+  assert.equal(project(null),null);
+ }
+});
+test('viewport fit rejects invalid or collapsed geometry',()=>{
+ assert.equal(fitPoseProjection([null,[NaN,0,0]],640,420),null);
+ assert.equal(fitPoseProjection([[0,0,0],[0,0,0]],640,420),null);
+ assert.equal(fitPoseProjection([[0,0,0],[1,1,1]],0,420),null);
+});
