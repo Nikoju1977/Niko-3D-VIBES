@@ -25,6 +25,13 @@ try:
                 btn=page.locator(f'[data-mode={mode}]');btn.click()
                 assert btn.get_attribute('aria-pressed')=='true', mode
             page.locator('[data-mode=avatar]').click()
+            page.locator('#morphExample').click()
+            assert 'singe' in page.locator('#morphPrompt').input_value()
+            page.locator('#morphPrompt').fill('une voiture')
+            page.locator('#morphApply').click()
+            assert 'non reconnu' in page.locator('#morphStatus').inner_text()
+            page.locator('#morphSelf').click()
+            assert 'portrait' in page.locator('#morphStatus').inner_text()
             page.locator('#avatarStyle').select_option('robot')
             page.locator('#avatarName').fill('TEST AVATAR')
             with page.expect_download() as info: page.locator('#avatarJson').click()
