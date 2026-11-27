@@ -11,3 +11,5 @@ La politique LICENSE.md reste inchangée. Les éventuels droits sur les contribu
 - niko-spatial.js : nouveau module de rendu WebGL2, géométrie procédurale historique réutilisée; aucune prétention de réimplémentation intégrale indépendante.
 
 - niko-avatar.js : nouveau module de retargeting directionnel et quaternion à partir de géométrie générale; repères MediaPipe tiers, aucun nouveau modèle IA propriétaire.
+
+- niko-motion-studio.js : nouveau module de morphologie et export GLB, géométrie cylindrique procédurale, assistance IA; licences et notices antérieures conservées.

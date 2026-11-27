@@ -74,3 +74,6 @@ Rendu natif WebGL2 optionnel du mode Holo, secours Canvas. Voir SPATIAL-ENGINE.m
 
 ### Avatar Engine 1.0
 Squelette directionnel artistique dans Digital Twin, repères world valides uniquement, voir AVATAR-ENGINE.md.
+
+### Motion Studio 1.0
+Trois morphologies artistiques, capture du rig et export GLB segmentaire. Voir MOTION-STUDIO.md. Pas de skinning ni de validation clinique.

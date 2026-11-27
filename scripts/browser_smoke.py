@@ -40,6 +40,11 @@ try:
                 const r=retargetAvatar(p);return {count:r.bones.length,clinical:r.clinicalValidation};
             }""")
             assert result['count'] == 7 and result['clinical'] is False, result
+            page.locator('#morphProfile').select_option('robot')
+            page.locator('#takeRecord').click()
+            assert 'attente corps complet' in page.locator('#takeStatus').inner_text()
+            assert page.locator('#takeGLB').is_disabled()
+            page.locator('#takeRecord').click()
             page.locator('#twinRig').select_option('landmarks')
             page.locator('[data-mode=holo]').click()
             page.locator('#renderer').select_option('gpu')
