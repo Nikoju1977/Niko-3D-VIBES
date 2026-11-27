@@ -102,6 +102,18 @@ try:
         n,kind=struct.unpack_from('<II',face,12)
         doc=json.loads(face[20:20+n])
         assert doc.get('images') and doc.get('meshes'),doc.keys()
+        # Feed a public portrait through an actual canvas-backed video stream. This tests live inference, not physical hardware.
+        import base64
+        page.evaluate("""async data=>{const img=new Image();img.src='data:image/jpeg;base64,'+data;await img.decode();const c=document.createElement('canvas');c.width=640;c.height=480;const g=c.getContext('2d');const paint=()=>{g.fillStyle='#777';g.fillRect(0,0,640,480);const s=Math.min(640/img.width,480/img.height);g.drawImage(img,(640-img.width*s)/2,(480-img.height*s)/2,img.width*s,img.height*s);};paint();const timer=setInterval(paint,80);const stream=c.captureStream(12);window.addEventListener('pagehide',()=>{clearInterval(timer);stream.getTracks().forEach(t=>t.stop());},{once:true});Object.defineProperty(navigator.mediaDevices,'getUserMedia',{configurable:true,value:async()=>stream});}""",base64.b64encode(portrait).decode())
+        page.locator('#faceCamera').click()
+        expect(page.locator('#backend')).to_have_text('Visage seul',timeout=15000)
+        page.locator('#morphLive').check()
+        expect(page.locator('#faceTracking')).to_contain_text('Visage détecté',timeout=60000)
+        expect(page.locator('#morphStatus')).to_contain_text('identité de référence conservée',timeout=15000)
+        page.locator('#faceCalibrate').click()
+        expect(page.locator('#morphStatus')).to_contain_text('identité de référence conservée',timeout=15000)
+        page.locator('#stop').click()
+        expect(page.locator('#faceTracking')).to_have_text('Suivi arrêté')
         page.locator('#morphClear').click()
         expect(page.locator('#realAvatarStage')).to_be_hidden()
         assert not errors,errors

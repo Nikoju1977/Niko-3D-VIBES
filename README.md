@@ -1,3 +1,7 @@
+# V7.4 — stabilité du suivi facial (candidate)
+
+Conservation du maillage photographique : variations relatives des repères par rapport à une calibration neutre, amplitudes bornées et lissage. Décodage de portrait alternatif si ImageBitmap indisponible, détection des nouvelles images uniquement, indication réelle du temps d'inférence, recalibration explicite. Nouveau test de suivi MediaPipe sur flux vidéo construit à partir d'un portrait public, sans webcam physique et sans données personnelles de l'utilisateur. Ce n'est pas une reconstruction complète ni une validation anatomique. Fusion après CI.
+
 # V7.3.1 — correctif de démarrage (candidat)
 
 Caméra visage indépendante des modèles mains/corps, aperçu immédiatement disponible, annulation et redémarrage par génération de session, délais de chargement bornés, messages de permissions, récupération PWA indépendante et cache cohérent par version. Nouveau test Chromium avec périphérique caméra simulé et véritable inférence MediaPipe, arrêt/redémarrage et réparation. Le matériel physique reste non vérifié. Aucun changement de confidentialité ni collecte de données.

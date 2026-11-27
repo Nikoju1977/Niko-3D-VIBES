@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {IdentityDeformer} from './morph-core.js';
+const mesh=v=>Array.from({length:468},()=>[v,v,v]);
+test('calibration preserves the portrait instead of replacing its geometry',()=>{const d=new IdentityDeformer(),a=new Float32Array(1404);assert.equal(d.apply(mesh(.1),mesh(.3),a,0),false);assert.ok(Math.abs(a[0]-.1)<1e-6);d.apply(mesh(.1),mesh(.3),a,100);assert.ok(Math.abs(a[0]-.1)<1e-6);d.apply(mesh(.1),mesh(.31),a,200);assert.ok(a[0]>.1&&a[0]<.11);});
+test('extreme deltas are bounded and calibration resets after loss',()=>{const d=new IdentityDeformer(),a=new Float32Array(1404);d.apply(mesh(.1),mesh(0),a,0);d.apply(mesh(.1),mesh(2),a,300);assert.ok(a[0]<=.1350001);assert.ok(a[2]<=.1250001);d.reset();d.apply(mesh(.1),mesh(-1),a,400);assert.ok(Math.abs(a[0]-.1)<1e-6);});
+test('zero amplitude leaves original geometry intact; invalid points rejected',()=>{const d=new IdentityDeformer(),a=new Float32Array(1404);d.apply(mesh(0),mesh(0),a,0);d.apply(mesh(0),mesh(1),a,200,0);assert.equal(a[0],0);assert.throws(()=>d.apply(mesh(0),mesh(NaN),a,300));});
