@@ -1,3 +1,7 @@
+# V7.6.1 — cadrage automatique (candidat)
+
+Cadrage visuel par enveloppe des repères projetés, marges et conservation des proportions pour Digital Twin, Motion Capture et avatar procédural. Les coordonnées enregistrées restent inchangées. Import GLB/VRM : normalisation sur la dimension maximale et cadrage tenant compte du champ horizontal et vertical ; nouveau cadrage lors d’un changement important de ratio. Les anciens repères sont effacés au changement d’atelier, et la capture Motion Capture cesse à sa sortie. Tests géométriques synthétiques ajoutés ; validation navigateur, caméra réelle et CI encore requises. Aucun changement de licence ou service payant.
+
 # Holo OS V7.6 — candidat
 
 Branche expérimentale indépendante, inspirée des interfaces spatiales publiques, sans incorporation de code Augma. Zoom relatif par pincement des deux mains, contrôle gestuel désactivable, rejet des inférences dont le délai dépasse 500 ms et invalidation lors des changements d’atelier. Guide intégré et lanceur vers cinq outils Studio Niko : liens externes seulement, sans exécution des agents ni partage automatique de données. Le cache PWA change de version. Les onze ateliers historiques sont conservés. Les tests synthétiques du zoom sont ajoutés ; CI, disponibilité des liens externes et essais physiques restent à confirmer. Aucun service payant ni nouvelle clé API.
