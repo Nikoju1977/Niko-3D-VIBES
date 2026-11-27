@@ -17,3 +17,5 @@ La politique LICENSE.md reste inchangée. Les éventuels droits sur les contribu
 - V5 niko-native.js : nouveau calcul d'angle par atan2, cadence par alternance de flexion bilatérale, assistance IA. Ancien engine.js conservé pour comparaison et provenance, exclu du build. Les conventions MediaPipe et commandes virtuelles compatibles restent en usage. Pas de certification clean-room ni modification de licence.
 
 - V5.1 : interpolation temporelle des franchissements et estimation sur périodes de même phase; benchmark synthétique déterministe, non clinique.
+
+- V6 : estimateur adaptatif bilatéral par quantiles robustes et corrélation, nouveau module niko-adaptive.js; V5.1 conservé comme référence. Assistance IA ChatGPT, aucun appel Agnes attesté.

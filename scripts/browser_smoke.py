@@ -21,7 +21,7 @@ try:
             diag=page.evaluate("window.StudioNikoCore.diagnostic()")
             assert 'Studio Niko Core: 0.1.0' in diag
             assert 'Aucune donnée de projet' in diag
-            assert 'NIKO Native V5' in page.locator('#gestureEngine').inner_text()
+            assert 'NIKO Native V6' in page.locator('#gestureEngine').inner_text()
             assert not (root / 'engine.js').exists()
             assert (root / 'niko-native.js').exists()
             assert page.locator('#measurementQuality').inner_text() == 'Aucune mesure'
@@ -125,6 +125,7 @@ try:
             assert decrypted['clinical_validation'] is False
             assert decrypted['precision_core'] == '1.0.0'
             assert decrypted['native_engine'] == '5.1.0'
+            assert decrypted['adaptive_engine'] == '6.0.0'
             assert page.locator('#exportPassword').input_value() == ''
             assert not errors, errors
             # V10 comparison with the same application scripts and two CSS variants.
