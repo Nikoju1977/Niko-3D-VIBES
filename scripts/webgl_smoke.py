@@ -29,6 +29,18 @@ try:
         with page.expect_download(timeout=60000) as info:
             page.locator('#morphExport').click()
         glb=Path(info.value.path()).read_bytes()
+        # Record actual rendered frames and verify container and browser decode.
+        page.locator('#assetVideo').click()
+        expect(page.locator('#assetVideo')).to_have_text('Arrêter et exporter')
+        page.wait_for_timeout(1200)
+        with page.expect_download(timeout=30000) as clip_info:
+            page.locator('#assetVideo').click()
+        clip=Path(clip_info.value.path()).read_bytes()
+        assert len(clip)>1000 and (clip[:4]==bytes.fromhex('1a45dfa3') or clip[4:8]==b'ftyp')
+        import base64
+        decoded=page.evaluate("""async data=>{const b=Uint8Array.from(atob(data),c=>c.charCodeAt(0)),u=URL.createObjectURL(new Blob([b],{type:b[0]===26?'video/webm':'video/mp4'})),v=document.createElement('video');try{return await new Promise((ok,fail)=>{let timer=setTimeout(()=>fail(Error('video decode timeout')),10000);v.onloadeddata=()=>{clearTimeout(timer);ok(v.videoWidth>0&&v.videoHeight>0)};v.onerror=()=>{clearTimeout(timer);fail(Error('video decode failed'))};v.src=u;v.load();});}finally{URL.revokeObjectURL(u)}}""",base64.b64encode(clip).decode())
+        assert decoded
+        print('Video recording: actual WebGL frames exported and decoded')
         magic,version,length=struct.unpack_from('<III',glb)
         assert magic==0x46546c67 and version==2 and length==len(glb)
         n,kind=struct.unpack_from('<II',glb,12)

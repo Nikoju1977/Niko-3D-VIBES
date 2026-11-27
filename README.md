@@ -1,3 +1,7 @@
+# V7.5 — qualité média (candidate)
+
+Lecture DJ conditionnée au décodage des métadonnées, erreurs visibles, crête échantillonnée dBFS réellement mesurée après compression (pas une mesure true peak), deux pistes WAV testées avec contrôle master et arrêt. Enregistrement du rendu WebGL, export WebM ou MP4 selon MediaRecorder, test de décodage du résultat. Nouveau test de démarrage et navigation Firefox/WebKit à viewport mobile (pas Safari ou téléphone physique). Fusion après validation complète. Pas de nouveau service payant ni de génération photoréaliste.
+
 # V7.4 — stabilité du suivi facial (candidate)
 
 Conservation du maillage photographique : variations relatives des repères par rapport à une calibration neutre, amplitudes bornées et lissage. Décodage de portrait alternatif si ImageBitmap indisponible, détection des nouvelles images uniquement, indication réelle du temps d'inférence, recalibration explicite. Nouveau test de suivi MediaPipe sur flux vidéo construit à partir d'un portrait public, sans webcam physique et sans données personnelles de l'utilisateur. Ce n'est pas une reconstruction complète ni une validation anatomique. Fusion après CI.
