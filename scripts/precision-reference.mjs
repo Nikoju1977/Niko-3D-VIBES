@@ -1,0 +1,8 @@
+// Local reference evaluation. No network, no identifiers in the accepted schema.
+import {open} from 'node:fs/promises';
+import {evaluateReference} from '../niko-precision-core.js';
+try{
+ if(process.argv.length!==3)throw Error('Usage: npm run precision:reference -- protocol.json');
+ const f=await open(process.argv[2],'r');
+ try{const st=await f.stat();if(!st.isFile()||st.size>16*1024*1024)throw Error('Invalid input size');const buffer=Buffer.alloc(st.size+1);const {bytesRead}=await f.read(buffer,0,buffer.length,0);if(bytesRead!==st.size)throw Error('Input changed or incomplete');const report=evaluateReference(JSON.parse(buffer.subarray(0,bytesRead).toString('utf8')));console.log(JSON.stringify(report,null,2));if(!report.meetsSpecifiedCriteria)process.exitCode=2;}finally{await f.close();}
+}catch(e){console.error('Evaluation refused:',e.message);process.exitCode=1;}
