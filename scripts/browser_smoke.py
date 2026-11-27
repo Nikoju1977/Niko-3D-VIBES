@@ -21,6 +21,9 @@ try:
             diag=page.evaluate("window.StudioNikoCore.diagnostic()")
             assert 'Studio Niko Core: 0.1.0' in diag
             assert 'Aucune donnée de projet' in diag
+            page.locator('#gestureEngine').select_option('niko')
+            assert page.locator('#gestureEngine').input_value() == 'niko'
+            page.locator('#gestureEngine').select_option('legacy')
             for mode in ['bio','robot','sound','cinema','dj','art','twin','agent','mocap','holo']:
                 btn=page.locator(f'[data-mode={mode}]');btn.click()
                 assert btn.get_attribute('aria-pressed')=='true', mode
