@@ -1,9 +1,29 @@
 // Studio Niko Design — V6 adaptive bilateral phase estimator; not a medical device.
 import {angle,clamp} from './niko-native.js';
-export const ADAPTIVE_VERSION='6.1.0';
+export const ADAPTIVE_VERSION='6.2.0';
+export const PRECISION_TUNING=Object.freeze({tau:65,fraction:.18,estimator:'phase_regression'});
 export const SELECTED_TUNING=Object.freeze({tau:65,fraction:.18});
 const quantile=(values,q)=>{const a=[...values].sort((x,y)=>x-y),i=(a.length-1)*q,j=Math.floor(i);return a[j]+(a[Math.min(j+1,a.length-1)]-a[j])*(i-j);};
 const median=a=>quantile(a,.5);
+// Fit a common time slope with separate intercepts for left and right phases.
+// Retain the prior consistency gate; this estimator never rescues rejected data.
+export function phaseRegression(events,fallback){
+ if(!Array.isArray(events)||events.length<8||events.length>32||!Number.isFinite(fallback)||fallback<=0)return fallback;
+ const groups=[[],[]];
+ for(let i=0;i<events.length;i++){
+  const e=events[i];if(!e||!Number.isFinite(e.t)||![1,-1].includes(e.phase)||(i&&(e.t<=events[i-1].t||e.phase===events[i-1].phase)))return fallback;
+  groups[e.phase===1?0:1].push({x:i,y:e.t-events[0].t});
+ }
+ let numerator=0,denominator=0;
+ for(const g of groups){
+  if(g.length<4)return fallback;
+  const mx=g.reduce((s,v)=>s+v.x,0)/g.length,my=g.reduce((s,v)=>s+v.y,0)/g.length;
+  for(const v of g){numerator+=(v.x-mx)*(v.y-my);denominator+=(v.x-mx)**2;}
+ }
+ const period=numerator/denominator;
+ // Reject a disagreement beyond 8%; revert to the pre-existing robust median.
+ return Number.isFinite(period)&&Math.abs(period-fallback)<=.08*fallback?period:fallback;
+}
 function characterize(window,fraction){
  const n=window.length;if(n<16)return null;
  const l=window.map(x=>x.l),r=window.map(x=>x.r),d=window.map(x=>x.d);
@@ -16,7 +36,7 @@ function characterize(window,fraction){
  return {center:(hi+lo)/2,threshold:clamp(range*fraction,4,16),correlation:corr};
 }
 export class AdaptiveCadence{
- constructor({tau=65,fraction=.22}={}){if(![45,65].includes(tau)||![.18,.22].includes(fraction))throw Error('Unsupported experimental tuning');this.tau=tau;this.fraction=fraction;this.reset();}
+ constructor({tau=65,fraction=.22,estimator='median'}={}){if(![45,65].includes(tau)||![.18,.22].includes(fraction)||!['median','phase_regression'].includes(estimator))throw Error('Unsupported experimental tuning');this.tau=tau;this.fraction=fraction;this.estimator=estimator;this.reset();}
  reset(){this.total=0;this.clearWindow();}
  clearWindow(){this.last=null;this.start=null;this.filtered=null;this.window=[];this.events=[];this.phase=0;this.anchor=null;this.stats=null;this.lastAnalysis=-Infinity;this.reason='warmup';}
  update(p,t,aspect=1){
@@ -53,7 +73,8 @@ export class AdaptiveCadence{
   if(periods.some(x=>!Number.isFinite(x))){this.reason='irregular';return null;}
   const m=median(periods),mad=median(periods.map(x=>Math.abs(x-m)));
   if(mad/m>.12||periods.some(x=>Math.abs(x-m)>.25*m)||halves.some(x=>x<.55*m||x>1.45*m)){this.reason='irregular';return null;}
-  const spm=60000/m;if(spm<50||spm>240){this.reason='out_of_range';return null;}
+  const period=this.estimator==='phase_regression'?phaseRegression(this.events,m):m;
+  const spm=60000/period;if(spm<50||spm>240){this.reason='out_of_range';return null;}
   this.reason='accepted';return spm;
  }
 }
