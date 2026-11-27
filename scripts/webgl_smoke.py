@@ -51,6 +51,10 @@ try:
         page.locator('#assetPlay').click()
         page.locator('#assetReset').click()
         expect(page.locator('#assetSeek')).to_have_value('0')
+        page.locator('#realAvatarFile').set_input_files({'name':'invalid.glb','mimeType':'model/gltf-binary','buffer':b'invalid'})
+        expect(page.locator('#realAvatarStatus')).to_contain_text('Import impossible')
+        expect(page.locator('#realAvatarStage canvas')).to_be_visible()
+        expect(page.locator('#assetPlay')).to_be_enabled()
         page.locator('#realAvatarClear').click()
         expect(page.locator('#assetPlay')).to_be_disabled()
         # Official public MediaPipe test portrait; never use a user's private photo.
