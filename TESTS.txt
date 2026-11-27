@@ -1,0 +1,8 @@
+V3 — 27 novembre 2026
+npm test: 25/25 PASS (13 historiques, 12 nouveaux; Worker et MIDI testés avec doubles).
+npm run check: PASS (11 JS).
+python scripts/verify.py: PASS.
+npm run build: PASS (19 ressources).
+Chromium local headless: expiration après 9 secondes (exit 124), pas de résultat UI.
+GitHub Actions browser smoke ajouté, non exécuté sur GitHub.
+Caméra réelle, MediaPipe Worker réel, MIDI physique, Blender, performance et autonomie: non validés.

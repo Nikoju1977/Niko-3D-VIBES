@@ -1,0 +1,3 @@
+import {mkdirSync,copyFileSync,rmSync} from 'node:fs';
+const files=['index.html','style.css','app.js','vision-client.js','vision-worker.js','vision-models.js','neuro.js','engine.js','scene.js','advanced.js','motion.js','dj.js','sw.js','manifest.webmanifest','icon.svg','icon-192.png','icon-512.png','NOTICE.txt','LICENSE.md','blender_import.py'];
+rmSync('public-build',{recursive:true,force:true});mkdirSync('public-build');for(const f of files)copyFileSync(f,'public-build/'+f);console.log(`Built ${files.length} static assets`);

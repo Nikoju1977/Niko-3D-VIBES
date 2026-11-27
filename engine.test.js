@@ -1,0 +1,9 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {angle,Cadence,Gesture,robotAction} from './engine.js';
+const p=(x,y,visibility=1)=>({x,y,visibility});
+test('angle droit, alignement, coordonnées non carrées',()=>{assert.equal(angle(p(1,0),p(0,0),p(0,1)),90);assert.equal(angle(p(-1,0),p(0,0),p(1,0)),180);assert.equal(angle(p(1,1),p(0,0),p(1,-1),2).toFixed(2),'53.13')});
+test('angle absent si occultation ou vecteur nul',()=>{assert.equal(angle(p(1,0,.2),p(0,0),p(0,1)),null);assert.equal(angle(p(0,0),p(0,0),p(0,1)),null)});
+function hand(open){let q=Array.from({length:21},()=>p(.5,.8));for(let [tip,mcp,x] of [[8,5,.37],[12,9,.46],[16,13,.55],[20,17,.64]]){q[mcp]=p(x,.62);q[tip]=p(x,open?.28:.65);q[tip-2]=p(x,.48)}q[4]=p(.15,.55);return q}
+test('geste stabilisé, main perdue, poing',()=>{let g=new Gesture();assert.equal(g.update(hand(true),0).gesture,'NONE');assert.equal(g.update(hand(true),130).gesture,'OPEN');assert.equal(g.update(null,150),null);assert.equal(g.update(hand(false),200).gesture,'NONE');assert.equal(g.update(hand(false),340).gesture,'FIST')});
+test('pas de cadence sur signal immobile',()=>{let c=new Cadence(),q=Array.from({length:33},()=>p(0,.3));for(let t=0;t<5000;t+=50)assert.equal(c.update(q,t),null);assert.equal(c.total,0)});
+test('cadence synthétique 150 pas/min, arrêt et remise à zéro',()=>{let c=new Cadence(),v=null;for(let t=0;t<12000;t+=25){let q=Array.from({length:33},()=>p(0,.3));q[27]=p(0,.7+.1*Math.cos(t*2*Math.PI/800));q[28]=p(0,.7-.1*Math.cos(t*2*Math.PI/800));v=c.update(q,t)}assert.ok(v>=145&&v<=155,`cadence ${v}`);assert.ok(c.total>20);assert.equal(c.update(null,12000),null);c.reset();assert.equal(c.total,0)});
+test('robot refuse les gestes inconnus',()=>{assert.equal(robotAction('OPEN'),'SCAN');assert.equal(robotAction('INCONNU'),'REPOS');assert.equal(robotAction('FIST'),'POMPES')});
