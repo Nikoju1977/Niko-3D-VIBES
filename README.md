@@ -1,3 +1,7 @@
+# Holo OS V7.6 — candidat
+
+Branche expérimentale indépendante, inspirée des interfaces spatiales publiques, sans incorporation de code Augma. Zoom relatif par pincement des deux mains, contrôle gestuel désactivable, rejet des inférences dont le délai dépasse 500 ms et invalidation lors des changements d’atelier. Guide intégré et lanceur vers cinq outils Studio Niko : liens externes seulement, sans exécution des agents ni partage automatique de données. Le cache PWA change de version. Les onze ateliers historiques sont conservés. Les tests synthétiques du zoom sont ajoutés ; CI, disponibilité des liens externes et essais physiques restent à confirmer. Aucun service payant ni nouvelle clé API.
+
 # Correctif export vidéo V7.5.1
 
 Le fichier est finalisé en mémoire locale avant téléchargement volontaire ; la vidéo peut être téléchargée de nouveau ou effacée. Le test exige la disponibilité du fichier puis son décodage réel. L'échec intermittent de téléchargement de la V7.5 (workflow 46079322638) reste à revalider avec cette correction.
