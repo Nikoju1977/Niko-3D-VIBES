@@ -65,3 +65,6 @@ Voir [MEDICAL-QUALITY-SECURITY.md](MEDICAL-QUALITY-SECURITY.md). Mesures rejeté
 
 ### Precision Core 1.0
 Voir [PRECISION-CORE.md](PRECISION-CORE.md) : évaluation comparative locale et export de session chiffré optionnel. Pas de validation clinique.
+
+### Precision Core 1.1 (extension expérimentale)
+Budget d'incertitude, rapport d'étalonnage avec jeu de validation déclaré distinct, empreinte SHA-256. Aucune correction automatique. Voir PRECISION-CORE.md.

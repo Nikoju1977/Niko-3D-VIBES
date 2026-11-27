@@ -18,3 +18,5 @@ Aucune revendication de sécurité absolue ni de précision médicale. Les tests
 
 ## Complément Precision Core 1.0
 Export chiffré optionnel de la session biomécanique, JSON ordinaire et autres exports non chiffrés. Banc de référence local avec critères explicites. Voir PRECISION-CORE.md. Aucun patient, audit indépendant ni preuve clinique.
+
+Extension 1.1: budget d'incertitude conditionnel aux hypothèses fournies et étalonnage expérimental hors production clinique. Empreinte de rapport non signée. Aucun instrument réel validé.

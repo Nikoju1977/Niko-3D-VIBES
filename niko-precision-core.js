@@ -47,3 +47,46 @@ export async function decryptSession(doc,password){
  const plain=new Uint8Array(await cryptoAPI().subtle.decrypt({name:'AES-GCM',iv,additionalData:aad,tagLength:128},key,cipher));
  try{return dec.decode(plain);}finally{plain.fill(0);}
 }
+
+// V1.1: explicit uncertainty budget, no inference from model confidence.
+// Independent inputs in the same units; rectangular input = half-width.
+export function uncertaintyBudget(doc){
+ if(!exact(doc,['schema','metric','protocol','coverageFactor','repeatability','components'])||doc.schema!=='niko-uncertainty-v1'||!Object.hasOwn(metrics,doc.metric))throw Error('Invalid uncertainty schema');
+ if(typeof doc.protocol!=='string'||!/^[A-Za-z0-9._-]{1,80}$/.test(doc.protocol)||!finite(doc.coverageFactor,1,5))throw Error('Invalid protocol or coverage factor');
+ const [lo,hi]=metrics[doc.metric],r=doc.repeatability;
+ if(!exact(r,['values','measurand'])||!['single','mean'].includes(r.measurand)||!Array.isArray(r.values)||r.values.length<2||r.values.length>10000||!r.values.every(x=>finite(x,lo,hi)))throw Error('Invalid repeatability input');
+ if(!Array.isArray(doc.components)||doc.components.length>32)throw Error('Invalid uncertainty components');
+ let mean=0,m2=0,n=0;
+ for(const v of r.values){n++;const delta=v-mean;mean+=delta/n;m2+=delta*(v-mean);}
+ const sd=Math.sqrt(Math.max(0,m2/(n-1))),typeA=r.measurand==='mean'?sd/Math.sqrt(n):sd;
+ const ids=new Set(),components=doc.components.map(c=>{
+  if(!exact(c,['id','distribution','value','sensitivity'])||typeof c.id!=='string'||!/^[A-Za-z0-9._-]{1,60}$/.test(c.id)||ids.has(c.id)||!['standard','rectangular'].includes(c.distribution)||!finite(c.value,0,hi-lo)||!finite(c.sensitivity,-100,100))throw Error('Invalid uncertainty component');
+  ids.add(c.id);const standard=c.value/(c.distribution==='rectangular'?Math.sqrt(3):1);
+  return {...c,standard,contribution:Math.abs(c.sensitivity)*standard};
+ });
+ const combined=Math.hypot(typeA,...components.map(c=>c.contribution));
+ return {schema:'niko-uncertainty-report-v1',engine:'1.1.0',metric:doc.metric,protocol:doc.protocol,n,mean,sd,typeA,measurand:r.measurand,components,combined,coverageFactor:doc.coverageFactor,expanded:combined*doc.coverageFactor,assumption:'independent components; supplied coverage factor, not a verified confidence level',clinicalValidation:false};
+}
+// Fit on one dataset, assess on a distinct labelled dataset. No auto-application.
+export function assessCalibration(doc){
+ if(!exact(doc,['schema','metric','protocol','fitId','validationId','fit','validation','criteria'])||doc.schema!=='niko-calibration-v1'||!Object.hasOwn(metrics,doc.metric))throw Error('Invalid calibration schema');
+ for(const k of ['protocol','fitId','validationId'])if(typeof doc[k]!=='string'||!/^[A-Za-z0-9._-]{1,80}$/.test(doc[k]))throw Error('Invalid identifier');
+ if(doc.fitId===doc.validationId)throw Error('Distinct fit and validation datasets required');
+ const [lo,hi]=metrics[doc.metric];
+ if(!Array.isArray(doc.fit)||doc.fit.length<5||doc.fit.length>10000||!doc.fit.every(p=>exact(p,['reference','estimate'])&&finite(p.reference,lo,hi)&&finite(p.estimate,lo,hi)))throw Error('Invalid calibration fit');
+ let n=0,mx=0,my=0,sxx=0,sxy=0,min=Infinity,max=-Infinity;
+ for(const p of doc.fit){n++;const dx=p.estimate-mx,dy=p.reference-my;mx+=dx/n;my+=dy/n;sxx+=dx*(p.estimate-mx);sxy+=dx*(p.reference-my);min=Math.min(min,p.estimate);max=Math.max(max,p.estimate);}
+ if(max-min<1||sxx<1e-8)throw Error('Insufficient calibration span');
+ const slope=sxy/sxx,offset=my-slope*mx;
+ if(!finite(slope,0.01,100)||!Number.isFinite(offset))throw Error('Invalid calibration fit coefficient');
+ const raw={schema:'niko-reference-v1',metric:doc.metric,protocol:doc.protocol,criteria:doc.criteria,pairs:doc.validation};
+ const before=evaluateReference(raw);
+ const corrected=doc.validation.map(p=>{const x=p.estimate;if(x===null||x<min||x>max)return {reference:p.reference,estimate:null};const y=slope*x+offset;return {reference:p.reference,estimate:finite(y,lo,hi)?y:null};});
+ const after=evaluateReference({...raw,pairs:corrected});
+ return {schema:'niko-calibration-report-v1',engine:'1.1.0',metric:doc.metric,protocol:doc.protocol,fitId:doc.fitId,validationId:doc.validationId,fitCount:n,model:{slope,offset,min,max},before,after,autoApply:false,clinicalValidation:false};
+}
+export async function reportDigest(report){
+ const raw=JSON.stringify(report);if(typeof raw!=='string'||raw.length>LIMIT)throw Error('Invalid report');
+ const bytes=enc.encode(raw);if(bytes.length>LIMIT)throw Error('Report too large');
+ return {algorithm:'SHA-256',encoding:'UTF-8 JSON.stringify',digest:toHex(new Uint8Array(await cryptoAPI().subtle.digest('SHA-256',bytes)))};
+}
