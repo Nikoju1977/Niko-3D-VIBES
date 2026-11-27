@@ -32,7 +32,7 @@ test('filter reduces stationary alternating jitter and follows motion',()=>{
  assert.ok(filtered<raw*.5);for(let i=100;i<120;i++)f.update(.8,i*33);assert.ok(Math.abs(f.value-.8)<.01);
  console.log('Synthetic stationary jitter RMS ratio:',Math.sqrt(filtered/raw).toFixed(3));
 });
-test('new recognizer is selectable via tracker; default legacy unaffected',()=>{
+test('new recognizer is selectable via tracker; default native tracker',()=>{
  const h=new HandTracker({gestureFactory:()=>new NikoGesture()});
  h.update([hand()],[],0);assert.equal(h.update([hand()],[],150).primary.g.gesture,'OPEN');
  assert.equal(h.update([],[],200).primary,undefined);

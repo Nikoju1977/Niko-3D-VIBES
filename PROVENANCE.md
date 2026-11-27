@@ -13,3 +13,5 @@ La politique LICENSE.md reste inchangée. Les éventuels droits sur les contribu
 - niko-avatar.js : nouveau module de retargeting directionnel et quaternion à partir de géométrie générale; repères MediaPipe tiers, aucun nouveau modèle IA propriétaire.
 
 - niko-motion-studio.js : nouveau module de morphologie et export GLB, géométrie cylindrique procédurale, assistance IA; licences et notices antérieures conservées.
+
+- V5 niko-native.js : nouveau calcul d'angle par atan2, cadence par alternance de flexion bilatérale, assistance IA. Ancien engine.js conservé pour comparaison et provenance, exclu du build. Les conventions MediaPipe et commandes virtuelles compatibles restent en usage. Pas de certification clean-room ni modification de licence.

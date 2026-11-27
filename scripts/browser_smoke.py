@@ -21,10 +21,10 @@ try:
             diag=page.evaluate("window.StudioNikoCore.diagnostic()")
             assert 'Studio Niko Core: 0.1.0' in diag
             assert 'Aucune donnée de projet' in diag
-            page.locator('#gestureEngine').select_option('niko')
-            assert page.locator('#gestureEngine').input_value() == 'niko'
+            assert 'NIKO Native V5' in page.locator('#gestureEngine').inner_text()
+            assert not (root / 'engine.js').exists()
+            assert (root / 'niko-native.js').exists()
             assert page.locator('#measurementQuality').inner_text() == 'Aucune mesure'
-            page.locator('#gestureEngine').select_option('legacy')
             for mode in ['bio','robot','sound','cinema','dj','art','twin','agent','mocap','avatar','holo']:
                 btn=page.locator(f'[data-mode={mode}]');btn.click()
                 assert btn.get_attribute('aria-pressed')=='true', mode
@@ -124,6 +124,7 @@ try:
             }""", envelope)
             assert decrypted['clinical_validation'] is False
             assert decrypted['precision_core'] == '1.0.0'
+            assert decrypted['native_engine'] == '5.0.0'
             assert page.locator('#exportPassword').input_value() == ''
             assert not errors, errors
             # V10 comparison with the same application scripts and two CSS variants.

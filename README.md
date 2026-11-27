@@ -79,3 +79,6 @@ Le moteur local AutoCoder (blob `2ca34b69a196e14881bb1c50847d4764387761a5`) est 
 
 ## V4 PRO — consolidation
 Fusion fonctionnelle de la V3.4 et des moteurs V4 expérimentaux. Les onze modes, l'avatar GLB/VRM et les fonctions manuelles V3.4 sont conservés. Digital Twin propose en plus le rig directionnel et le GLB animé. Voir PRECISION-CORE.md, MEDICAL-QUALITY-SECURITY.md, SPATIAL-ENGINE.md, AVATAR-ENGINE.md et MOTION-STUDIO.md. Aucun usage médical validé. Tests navigateur et CI à confirmer sur cette consolidation; pas de publication automatique depuis la branche.
+
+## V5 Native Engine — candidate
+Angle-based gesture engine selected exclusively at runtime; new bilateral knee-phase estimator, non-clinical. Historical MIT engine retained in source and tests, excluded from production build. See NATIVE-ENGINE.md. Notices unchanged.
