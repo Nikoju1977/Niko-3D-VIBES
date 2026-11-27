@@ -1,3 +1,7 @@
+## Validation renforcée V3.3
+
+Le workflow ajoute une épreuve WebGL Chromium (SwiftShader) : création d’un singe par prompt, rendu, export PNG/GLB et réimport. Les bibliothèques WebGL sont téléchargées à la demande ; un échec CDN fait échouer le contrôle. Le test ne valide ni une caméra physique ni une reconstruction faciale réelle. Le guide de démarrage couvre les 11 ateliers.
+
 # V3.3 — Avatar Morph (candidat)
 
 Transformation textuelle déterministe par catalogue local : singe, chat, loup, alien, robot, humain ; couleur et style cyberpunk. Maillages stylisés WebGL, suivi facial MediaPipe de tête/bouche/clignements et visage texturé estimé depuis un portrait local. Export GLB de la pose actuelle (pas de rig exporté ni d'animation). Aucune photo publiée ou envoyée ; modèles et bibliothèques téléchargés à la demande. Aucun moteur texte-vers-3D libre ni photoréalisme garanti. Tests Node et UI à lancer ; WebGL/CDN/visage réel à vérifier séparément.

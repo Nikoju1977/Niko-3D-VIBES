@@ -50,6 +50,6 @@ try:
             assert not errors, errors
             page.close()
         browser.close()
-    print('Browser smoke: desktop/mobile viewport, 10 tabs, OBJ export, stop: OK')
+    print('Browser smoke: desktop/mobile viewport, 11 tabs, OBJ export, stop: OK')
 finally:
     server.shutdown();server.server_close()
