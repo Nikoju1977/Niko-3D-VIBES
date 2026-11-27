@@ -1,3 +1,7 @@
+# V3.4 — fiabilité et ateliers sans caméra (candidat)
+
+Robot manuel, zoom Holo, pavé synthétiseur tactile et clavier, timbres, caméra virtuelle manuelle enregistrable, export biomécanique CSV, désarmement de l'agent à la sortie du module, remise à zéro du visage après perte de suivi, arrêt audio lorsque l'onglet est masqué, cache versionné. Tests navigateur étendus aux nouveaux contrôles, test de reconstruction sur portrait public MediaPipe (pas de portrait personnel). Le photoréalisme et les appareils physiques ne sont pas validés par ces essais.
+
 ## Validation renforcée V3.3
 
 Le workflow ajoute une épreuve WebGL Chromium (SwiftShader) : création d’un singe par prompt, rendu, export PNG/GLB et réimport. Les bibliothèques WebGL sont téléchargées à la demande ; un échec CDN fait échouer le contrôle. Le test ne valide ni une caméra physique ni une reconstruction faciale réelle. Le guide de démarrage couvre les 11 ateliers.
