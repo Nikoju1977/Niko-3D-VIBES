@@ -23,6 +23,7 @@ try:
             assert 'Aucune donnée de projet' in diag
             page.locator('#gestureEngine').select_option('niko')
             assert page.locator('#gestureEngine').input_value() == 'niko'
+            assert page.locator('#measurementQuality').inner_text() == 'Aucune mesure'
             page.locator('#gestureEngine').select_option('legacy')
             for mode in ['bio','robot','sound','cinema','dj','art','twin','agent','mocap','holo']:
                 btn=page.locator(f'[data-mode={mode}]');btn.click()

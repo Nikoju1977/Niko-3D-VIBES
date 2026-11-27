@@ -59,3 +59,6 @@ Le moteur local AutoCoder (blob `2ca34b69a196e14881bb1c50847d4764387761a5`) est 
 
 ## V4 — NIKO Gesture Intelligence (expérimental)
 Choisir le moteur NIKO Gesture V4 dans la barre des commandes. Reconnaissance par angles articulaires 3D estimés et filtrage adaptatif du mouvement. Le moteur historique reste le choix par défaut et peut être réactivé immédiatement. Les changements de moteur réinitialisent le suivi. Tests synthétiques et smoke navigateur, pas de validation sur caméra réelle ni de comparaison de précision avec les projets MIT. Voir PROVENANCE.md. Les notices et conditions de diffusion restent inchangées.
+
+### Contrôle qualité V4
+Voir [MEDICAL-QUALITY-SECURITY.md](MEDICAL-QUALITY-SECURITY.md). Mesures rejetées si signal insuffisant, cadence conditionnée à la continuité, exports non calibrés explicitement identifiés. Non médical et non certifié.
