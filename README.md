@@ -1,3 +1,11 @@
+# V7.3.1 — correctif de démarrage (candidat)
+
+Caméra visage indépendante des modèles mains/corps, aperçu immédiatement disponible, annulation et redémarrage par génération de session, délais de chargement bornés, messages de permissions, récupération PWA indépendante et cache cohérent par version. Nouveau test Chromium avec périphérique caméra simulé et véritable inférence MediaPipe, arrêt/redémarrage et réparation. Le matériel physique reste non vérifié. Aucun changement de confidentialité ni collecte de données.
+
+# V7.3 — Motion Expression (candidate)
+
+Prises faciales locales : enregistrement des coefficients MediaPipe ou du contrôle manuel (sources distinctes), lecture interpolée, import/export JSON et export GLB animé des morph targets compatibles. Maximum 60 s/1800 images ; arrêt sur perte du signal ou changement d'atelier. Le fichier GLB animé n'est proposé que pour les cibles GLB compatibles, pas pour VRM. Tests unitaires et navigateur avec une cible de morphologie réelle et une prise manuelle ; aucune prétention de validation sur caméra physique. Aucun modèle génératif libre intégré.
+
 # V7.2 — Expression Studio (candidate)
 
 Les GLB contenant des cibles faciales reconnues et les VRM contenant des expressions peuvent recevoir les coefficients MediaPipe localement. Détection explicite des canaux compatibles, essai manuel de la bouche, lissage et remise à zéro, priorité du suivi facial sur les clips. Ne crée pas de rig pour un modèle statique et ne génère pas d'avatar photoréaliste à partir d'un prompt. Le test navigateur utilise un GLB synthétique muni d'une vraie cible de morphologie ; caméra physique et VRM réel restent à qualifier.
