@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {validModel,readGLBJSON,LIMBS} from './real-avatar.js';
+function glb(j){const b=new TextEncoder().encode(JSON.stringify(j)),n=(b.length+3)&~3,a=new ArrayBuffer(20+n),v=new DataView(a);v.setUint32(0,0x46546c67,true);v.setUint32(4,2,true);v.setUint32(8,a.byteLength,true);v.setUint32(12,n,true);v.setUint32(16,0x4e4f534a,true);const bytes=new Uint8Array(a,20);bytes.fill(32);bytes.set(b);return a;}
+test('accepts supported local files within limit',()=>{assert.equal(validModel({name:'human.vrm',size:1024}),true);assert.equal(validModel({name:'human.glb',size:101*1024*1024}),false);assert.equal(validModel({name:'human.obj',size:100}),false);});
+test('blocks external resource URIs in GLB',()=>{assert.throws(()=>readGLBJSON(glb({images:[{uri:'https://example.com/image.png'}]})),/externe/);assert.deepEqual(readGLBJSON(glb({asset:{version:'2.0'}})),{asset:{version:'2.0'}});assert.throws(()=>readGLBJSON(new ArrayBuffer(0)));});
+test('eight limb segments use valid landmarks',()=>{assert.equal(LIMBS.length,8);assert.ok(LIMBS.every(x=>x[2]>=0&&x[3]<33));});
