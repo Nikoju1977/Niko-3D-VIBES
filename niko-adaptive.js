@@ -1,13 +1,13 @@
 // Studio Niko Design — V6 adaptive bilateral phase estimator; not a medical device.
 import {angle,clamp} from './niko-native.js';
-export const ADAPTIVE_VERSION='6.4.0';
+export const ADAPTIVE_VERSION='6.5.0';
 export const PRECISION_TUNING=Object.freeze({tau:65,fraction:.18,estimator:'phase_regression'});
 export const SELECTED_TUNING=Object.freeze({tau:65,fraction:.18});
 // V6.3 selection; retained V6.2 mode remains available for comparative tests.
 export const DYNAMIC_TUNING=Object.freeze({tau:65,fraction:.18,estimator:'adaptive_regression'});
 // V6.4 application candidate; earlier tuning retained for reproducibility.
 export const FRESHNESS_TUNING=Object.freeze({tau:65,fraction:.18,estimator:'freshness_regression'});
-// Research only: no substitution or interpolation of missing landmarks.
+// V6.5 application candidate: no substitution or interpolation of missing landmarks.
 export const ROBUST_TUNING=Object.freeze({tau:65,fraction:.18,estimator:'robust_vision'});
 const quantile=(values,q)=>{const a=[...values].sort((x,y)=>x-y),i=(a.length-1)*q,j=Math.floor(i);return a[j]+(a[Math.min(j+1,a.length-1)]-a[j])*(i-j);};
 const median=a=>quantile(a,.5);
