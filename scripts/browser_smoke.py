@@ -32,6 +32,38 @@ try:
             data=Path(info.value.path()).read_text();assert '\nv ' in data and '\nl ' in data
             page.locator('#stop').click();assert 'ARRÊTÉ' in page.locator('#status').inner_text()
             assert not errors, errors
+
+            # V10 comparison with the same application scripts and two CSS variants.
+            css = (root / 'style.css').read_text()
+            marker = '/* Studio Niko UI Engine V10'
+            assert marker in css
+            original = css.split(marker, 1)[0]
+            measurements = {}
+            for variant in ['before','after']:
+                probe = browser.new_page(viewport=viewport, service_workers='block', reduced_motion='reduce')
+                probe.route('**/style.css', lambda route: route.fulfill(status=200, content_type='text/css', body=original if variant == 'before' else css))
+                probe.goto(f'http://127.0.0.1:{server.server_port}/', wait_until='domcontentloaded', timeout=15000)
+                probe.wait_for_selector('#advCanvas', state='attached', timeout=10000)
+                data = probe.evaluate("""() => {
+                    const buttons = [...document.querySelectorAll('.tabs button')];
+                    const controls = [...document.querySelectorAll('.tabs button,.actions button,.actions select')].filter(e => e.getBoundingClientRect().width > 0);
+                    const rect = e => e.getBoundingClientRect();
+                    return {overflow: Math.max(0,document.documentElement.scrollWidth-innerWidth), tabs: buttons.length,
+                      visible: controls.length, small: controls.filter(e => rect(e).height < 44).length,
+                      columns: getComputedStyle(document.querySelector('.tabs')).gridTemplateColumns,
+                      active: getComputedStyle(document.querySelector('.tabs button.active')).backgroundColor};
+                }""")
+                measurements[variant] = data
+                if variant == 'after':
+                    assert data['tabs'] == 10 and data['small'] == 0, data
+                    assert data['active'] == 'rgb(194, 187, 255)', data
+                    probe.locator('[data-mode=robot]').focus()
+                    assert probe.locator('[data-mode=robot]').evaluate("(e) => getComputedStyle(e).outlineStyle") == 'solid'
+                probe.close()
+            assert measurements['after']['overflow'] <= measurements['before']['overflow'], measurements
+            assert measurements['after']['overflow'] == 0, measurements
+            assert measurements['after']['visible'] >= measurements['before']['visible'], measurements
+            print(f"UI Engine V10 {viewport['width']}px before/after: {measurements}")
             page.close()
         browser.close()
     print('Browser smoke: desktop/mobile viewport, 10 tabs, OBJ export, stop: OK')
