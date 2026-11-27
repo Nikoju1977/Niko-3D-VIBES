@@ -29,6 +29,19 @@ try:
             for mode in ['bio','robot','sound','cinema','dj','art','twin','agent','mocap','holo']:
                 btn=page.locator(f'[data-mode={mode}]');btn.click()
                 assert btn.get_attribute('aria-pressed')=='true', mode
+            page.locator('[data-mode=twin]').click()
+            page.locator('#twinRig').select_option('avatar')
+            page.wait_for_function("document.getElementById('avatarStatus').textContent === 'Avatar : signal 3D insuffisant'")
+            # Synthetic data verifies the actual module in the browser, not camera inference.
+            result = page.evaluate("""async () => {
+                const {retargetAvatar}=await import('./niko-avatar.js');
+                const p=Array(33).fill(null);
+                for(const [i,x,y] of [[11,.2,-.5],[12,-.2,-.5],[23,.12,0],[24,-.12,0],[13,.5,-.5],[15,.7,-.5]])p[i]={x,y,z:0,visibility:1};
+                const r=retargetAvatar(p);return {count:r.bones.length,clinical:r.clinicalValidation};
+            }""")
+            assert result['count'] == 7 and result['clinical'] is False, result
+            page.locator('#twinRig').select_option('landmarks')
+            page.locator('[data-mode=holo]').click()
             page.locator('#renderer').select_option('gpu')
             page.wait_for_function("document.getElementById('rendererStatus').textContent === 'WebGL 2 · actif'")
             # Actual shader draw/readback on CI software WebGL, not physical GPU.

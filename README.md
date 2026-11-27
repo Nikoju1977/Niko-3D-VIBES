@@ -71,3 +71,6 @@ Budget d'incertitude, rapport d'étalonnage avec jeu de validation déclaré dis
 
 ### Spatial Engine 1.0
 Rendu natif WebGL2 optionnel du mode Holo, secours Canvas. Voir SPATIAL-ENGINE.md. Aucune mesure clinique dérivée du rendu.
+
+### Avatar Engine 1.0
+Squelette directionnel artistique dans Digital Twin, repères world valides uniquement, voir AVATAR-ENGINE.md.
