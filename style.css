@@ -53,3 +53,5 @@ button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible,.b
 .face-quality{display:grid;gap:8px;min-width:0;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}.face-quality span{color:var(--accent);font-variant-numeric:tabular-nums}.face-quality small{color:var(--muted);font-size:12px}.face-quality input[type=range]{width:100%}
 
 .dj-meter{flex-basis:100%;display:grid;gap:6px;padding:12px;border:1px solid var(--line);border-radius:12px}.dj-meter meter{width:100%;height:18px}.dj-meter span{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.render-cadence{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;overflow-wrap:anywhere;max-width:100%}
