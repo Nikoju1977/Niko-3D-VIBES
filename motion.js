@@ -9,3 +9,17 @@ export const ACTIONS=['next','center','clearStroke','captureToggle'];
 export class Agent{constructor(templates=[]){this.templates=Array.isArray(templates)?templates.filter(v=>v&&typeof v.name==='string'&&ACTIONS.includes(v.action)&&Array.isArray(v.vector)&&v.vector.length===63&&v.vector.every(Number.isFinite)).slice(0,30):[];this.reset()}reset(){this.candidate=null;this.since=0;this.latched=false;this.last=-Infinity}learn(name,action,samples){if(!name.trim()||!ACTIONS.includes(action)||samples.length<5||samples.some(s=>!s||s.length!==63||!s.every(Number.isFinite)))return false;let vector=samples[0].map((_,i)=>samples.reduce((n,s)=>n+s[i],0)/samples.length);if(samples.some(s=>distance(s,vector)>.25))return false;this.templates=this.templates.filter(t=>t.name!==name);if(this.templates.length>=30)return false;this.templates.push({name:name.slice(0,60),action,vector});return true}update(v,t){let ranked=this.templates.map(x=>({...x,d:distance(v,x.vector)})).sort((a,b)=>a.d-b.d);let best=ranked[0];if(!best||best.d>.19||(ranked[1]&&ranked[1].d-best.d<.045)){this.candidate=null;this.latched=false;return null}if(this.candidate!==best.name){this.candidate=best.name;this.since=t;this.latched=false}if(!this.latched&&t-this.since>=500&&t-this.last>=1200){this.latched=true;this.last=t;return best}return null}}
 export class Art{constructor(){this.clear()}clear(){this.strokes=[];this.current=null;this.count=0}end(){this.current=null}add(x,y,z,color){if(![x,y,z].every(Number.isFinite)||this.count>=30000)return false;let p=[clamp(x,-2,2),clamp(y,-2,2),clamp(z,-2,2)];if(!this.current){this.current={color,points:[]};this.strokes.push(this.current)}let prev=this.current.points.at(-1);if(prev&&Math.hypot(...p.map((v,i)=>v-prev[i]))<.012)return false;this.current.points.push(p);this.count++;return true}undo(){this.end();let s=this.strokes.pop();if(s)this.count-=s.points.length}obj(){let out=['# NIKO SYNAPSE — normalized 3D strokes'];let i=1;for(let s of this.strokes)for(let p of s.points)out.push('v '+p.join(' '));for(let s of this.strokes){if(s.points.length>1)out.push('l '+s.points.map((_,j)=>i+j).join(' '));else if(s.points.length)out.push('p '+i);i+=s.points.length}return out.join('\n')+'\n'}}
 export function cameraFrame(g,t){return g?{t_ms:t,yaw:(g.x-.5)*Math.PI*2,pitch:(.5-g.y)*Math.PI/2,focal_mm:24+clamp(g.open,0,1)*61}:null}
+
+// Display-only camera fitting; never alters captured coordinates or exports.
+export function fitPoseProjection(points,w,h,{yaw=0,padding=36,maxScale=340,perspective=false}={}){
+ const valid=p=>Array.isArray(p)&&p.length===3&&p.every(v=>Number.isFinite(v)&&Math.abs(v)<=100);
+ if(!Array.isArray(points)||![w,h,yaw,padding,maxScale].every(Number.isFinite)||w<=0||h<=0||padding<0||maxScale<=0)return null;
+ const cs=Math.cos(yaw),sn=Math.sin(yaw);
+ const raw=p=>{if(!valid(p))return null;const x=p[0]*cs+p[2]*sn,z=-p[0]*sn+p[2]*cs,f=perspective?3/(3+Math.max(-1.5,Math.min(1.5,z))):1;return [x*f,-p[1]*f,z];};
+ const q=points.map(raw).filter(Boolean);if(q.length<2)return null;
+ let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+ for(const p of q){minX=Math.min(minX,p[0]);maxX=Math.max(maxX,p[0]);minY=Math.min(minY,p[1]);maxY=Math.max(maxY,p[1]);}
+ const dx=maxX-minX,dy=maxY-minY;if(Math.max(dx,dy)<1e-6)return null;
+ const margin=Math.min(padding,w*.24,h*.24),scale=Math.min(maxScale,(w-2*margin)/Math.max(dx,1e-6),(h-2*margin)/Math.max(dy,1e-6)),cx=(minX+maxX)/2,cy=(minY+maxY)/2;
+ return p=>{const a=raw(p);return a?[w/2+(a[0]-cx)*scale,h/2+(a[1]-cy)*scale,a[2]]:null;};
+}
