@@ -1,3 +1,7 @@
+## V7 — atelier de lecture et export vidéo
+
+Lecture des clips GLB incorporés (AnimationMixer), choix du clip, lecture/pause, position, vitesse, recadrage et export WebM local de 60 s maximum si MediaRecorder est disponible. La capture vidéo ne contient ni audio ni webcam. Le test WebGL utilise une animation synthétique déterministe générée par le moteur GLB, et non une prétendue capture réelle. Le photoréalisme reste dépendant du modèle importé.
+
 # V7 Studio — candidate
 
 Refonte du poste de création, guide contextuel, accès directs et agrandissement. Holo utilise un nouveau maillage surfacique ombré (Canvas 2D) par défaut ; le moteur de points WebGL V6.5 reste disponible. Les moteurs natifs, garde-fous cliniques, licences et intégrité sont conservés. Version candidate à valider.
