@@ -39,3 +39,5 @@ button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible,.b
 .morph-studio,.quick-guide{background:var(--panel);border-color:var(--line)}.morph-studio legend{color:var(--accent)}.morph-studio textarea{background:var(--bg);border-color:var(--line);min-width:0}.morph-studio label{min-width:0}.morph-studio input[type=file],#realAvatarFile{max-width:100%;min-width:0}.header-actions{min-width:0}
 
 #soundPad{display:grid;place-items:center;gap:10px;padding:12px;min-height:145px;border:1px solid var(--line);border-radius:16px;background:radial-gradient(ellipse,#383b61,var(--bg));touch-action:none;user-select:none;cursor:crosshair}#soundPad small{font-size:11px;color:var(--muted)}#soundPad:focus-visible{outline:3px solid var(--accent)}#soundview{aspect-ratio:auto;min-height:280px;gap:8px;place-content:center stretch}#soundview label{max-width:100%;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px}
+
+.scene .spatial-gpu{position:absolute;inset:0;pointer-events:none;width:100%;height:100%}

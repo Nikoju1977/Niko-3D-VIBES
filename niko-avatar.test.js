@@ -1,0 +1,9 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {directionQuaternion,rotateVector,retargetAvatar,AvatarTracker} from './niko-avatar.js';
+const near=(a,b)=>a.every((v,i)=>Math.abs(v-b[i])<1e-9);
+function pose(){let a=Array(33).fill(null);const coords={0:[0,-.8,0],11:[.2,-.5,0],12:[-.2,-.5,0],13:[.5,-.5,0],14:[-.5,-.5,0],15:[.7,-.5,0],16:[-.7,-.5,0],23:[.12,0,0],24:[-.12,0,0],25:[.12,.4,0],26:[-.12,.4,0],27:[.12,.8,0],28:[-.12,.8,0]};for(const [i,[x,y,z]] of Object.entries(coords))a[i]={x,y,z,visibility:1};return a;}
+test('direction rotation handles identity, perpendicular and antiparallel',()=>{for(const b of [[1,0,0],[0,1,0],[-1,0,0]]){const q=directionQuaternion([1,0,0],b);assert.ok(near(rotateVector(q,[1,0,0]),b));assert.ok(Math.abs(Math.hypot(...q)-1)<1e-9);}assert.equal(directionQuaternion([0,0,0],[1,0,0]),null);});
+test('retarget preserves fixed rig lengths and supports different limb orientation',()=>{let p=pose(),a=retargetAvatar(p);assert.equal(a.bones.length,14);assert.equal(a.clinicalValidation,false);p[15]={x:.5,y:-.2,z:0,visibility:1};a=retargetAvatar(p);assert.ok(near(a.joints.leftWrist.map((v,i)=>v-a.joints.leftElbow[i]),[0,-.26,0]));for(const b of a.bones)assert.ok(Math.abs(Math.hypot(...a.joints[b.name].map((v,i)=>v-a.joints[b.parent][i]))-b.length)<1e-9);});
+test('missing pelvis or shoulders reject frame; missing limb rejects descendant',()=>{let p=pose();p[23]=null;assert.equal(retargetAvatar(p),null);p=pose();p[13].visibility=.5;let a=retargetAvatar(p);assert.equal(a.joints.leftElbow,undefined);assert.equal(a.joints.leftWrist,undefined);assert.ok(a.joints.rightWrist);});
+test('frame expiration, invalid time and backwards timestamp fail closed',()=>{const t=new AvatarTracker();assert.ok(t.update(pose(),100));assert.ok(t.current(600));assert.equal(t.current(601),null);assert.equal(t.update(pose(),99),null);assert.equal(t.update(pose(),NaN),null);assert.equal(t.update(null,700),null);});

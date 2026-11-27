@@ -1,0 +1,5 @@
+# NIKO Spatial Engine 1.0 — rendu expérimental
+
+Nouveau moteur WebGL 2 natif sans dépendance, écrit pour ce projet avec assistance IA. Utilise la géométrie procédurale existante (pas un moteur de génération de maillages). Projection perspective, tampon de profondeur, shaders fixes, upload de points lors du changement de modèle, budget 30 000 points et environ 4 millions de pixels. Coordonnées locales arbitraires, pas de mètres calibrés. Aucune mesure biomécanique dérivée du rendu. Pas de GLB/VRM, IK, matériaux PBR ni avatar photoréaliste à ce stade.
+
+Choisir NIKO Spatial WebGL 2 dans Holo 3D. Le Canvas reste par défaut, le robot et les autres modes restent sur leur moteur existant. Perte du contexte ou erreur: retour Canvas; sélectionner à nouveau le moteur pour réessayer. Aucun téléchargement, shader utilisateur, secret ni donnée caméra dans ce module. Le test Chromium utilise SwiftShader (WebGL logiciel), vérifie réellement un pixel du shader et simule la perte de contexte; ne mesure pas un GPU physique ni la cadence réelle. Tests de matériel à réaliser. Notice et licences existantes conservées.

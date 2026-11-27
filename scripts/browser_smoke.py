@@ -9,7 +9,7 @@ server = ThreadingHTTPServer(('127.0.0.1', 0), partial(SimpleHTTPRequestHandler,
 Thread(target=server.serve_forever, daemon=True).start()
 try:
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        browser = p.chromium.launch(args=['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
         for viewport in [{'width':1280,'height':800},{'width':390,'height':844}]:
             page = browser.new_page(viewport=viewport, accept_downloads=True)
             errors=[]
@@ -21,9 +21,49 @@ try:
             diag=page.evaluate("window.StudioNikoCore.diagnostic()")
             assert 'Studio Niko Core: 0.1.0' in diag
             assert 'Aucune donnée de projet' in diag
+            page.locator('#gestureEngine').select_option('niko')
+            assert page.locator('#gestureEngine').input_value() == 'niko'
+            assert page.locator('#measurementQuality').inner_text() == 'Aucune mesure'
+            page.locator('#gestureEngine').select_option('legacy')
             for mode in ['bio','robot','sound','cinema','dj','art','twin','agent','mocap','avatar','holo']:
                 btn=page.locator(f'[data-mode={mode}]');btn.click()
                 assert btn.get_attribute('aria-pressed')=='true', mode
+            page.locator('[data-mode=twin]').click()
+            page.locator('#twinRig').select_option('avatar')
+            page.wait_for_function("document.getElementById('twinAvatarStatus').textContent === 'Avatar : signal 3D insuffisant'")
+            # Synthetic data verifies the actual module in the browser, not camera inference.
+            result = page.evaluate("""async () => {
+                const {retargetAvatar}=await import('./niko-avatar.js');
+                const p=Array(33).fill(null);
+                for(const [i,x,y] of [[11,.2,-.5],[12,-.2,-.5],[23,.12,0],[24,-.12,0],[13,.5,-.5],[15,.7,-.5]])p[i]={x,y,z:0,visibility:1};
+                const r=retargetAvatar(p);return {count:r.bones.length,clinical:r.clinicalValidation};
+            }""")
+            assert result['count'] == 7 and result['clinical'] is False, result
+            page.locator('#morphProfile').select_option('robot')
+            page.locator('#takeRecord').click()
+            assert 'attente corps complet' in page.locator('#takeStatus').inner_text(), page.locator('#takeStatus').inner_text()
+            assert page.locator('#takeRecord').inner_text() == 'Arrêter la prise'
+            assert page.locator('#takeGLB').is_disabled()
+            page.locator('#takeRecord').click()
+            assert page.locator('#takeRecord').inner_text() == 'Enregistrer la prise'
+            assert 'arrêtée' in page.locator('#takeStatus').inner_text()
+            page.locator('#twinRig').select_option('landmarks')
+            page.locator('[data-mode=holo]').click()
+            page.locator('#renderer').select_option('gpu')
+            page.wait_for_function("document.getElementById('rendererStatus').textContent === 'WebGL 2 · actif'")
+            # Actual shader draw/readback on CI software WebGL, not physical GPU.
+            pixels = page.evaluate("""async () => {
+                const {SpatialRenderer}=await import('./niko-spatial.js');
+                const canvas=document.createElement('canvas'),r=new SpatialRenderer(canvas);
+                const ok=r.draw([{color:'#ff0000',dir:[0,0,0],points:[[0,0,0]]}],{yaw:0,pitch:0,zoom:1,explode:0},128,128,1);
+                const pixel=new Uint8Array(4);r.gl.readPixels(64,64,1,1,r.gl.RGBA,r.gl.UNSIGNED_BYTE,pixel);r.dispose();
+                return {ok,pixel:[...pixel]};
+            }""")
+            assert pixels['ok'] and pixels['pixel'][0] > 200 and pixels['pixel'][1] < 30, pixels
+            page.evaluate("document.querySelector('.spatial-gpu').dispatchEvent(new Event('webglcontextlost',{cancelable:true}))")
+            page.wait_for_function("document.getElementById('rendererStatus').textContent === 'Canvas 2D · repli GPU'")
+            page.locator('#renderer').select_option('cpu')
+            print('Spatial: WebGL2 shader readback and context-loss fallback OK')
             page.locator('[data-mode=robot]').click()
             page.locator('#robotManual').select_option('SCAN')
             assert page.locator('#robotState').inner_text()=='SCAN'
@@ -48,6 +88,7 @@ try:
             import json
             assert len(json.loads(Path(info.value.path()).read_text())['frames'])>0
             page.locator('[data-mode=bio]').click()
+            page.once('dialog', lambda d: d.accept())
             with page.expect_download() as info: page.locator('#bioCsv').click()
             assert 'cadence_spm' in Path(info.value.path()).read_text()
             page.locator('[data-mode=avatar]').click()
@@ -73,6 +114,17 @@ try:
             with page.expect_download() as info: page.locator('#artExport').click()
             data=Path(info.value.path()).read_text();assert '\nv ' in data and '\nl ' in data
             page.locator('#stop').click();assert 'ARRÊTÉ' in page.locator('#status').inner_text()
+            page.locator('#exportPassword').fill('synthetic browser passphrase')
+            with page.expect_download() as encrypted: page.locator('#exportEncrypted').click()
+            envelope = json.loads(Path(encrypted.value.path()).read_text())
+            assert envelope['cipher'] == 'AES-256-GCM' and 'measurements' not in envelope
+            decrypted = page.evaluate("""async envelope => {
+                const {decryptSession}=await import('./niko-precision-core.js');
+                return JSON.parse(await decryptSession(envelope,'synthetic browser passphrase'));
+            }""", envelope)
+            assert decrypted['clinical_validation'] is False
+            assert decrypted['precision_core'] == '1.0.0'
+            assert page.locator('#exportPassword').input_value() == ''
             assert not errors, errors
             # V10 comparison with the same application scripts and two CSS variants.
             css = (root / 'style.css').read_text()
