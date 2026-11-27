@@ -1,3 +1,7 @@
+# V3.2 — Avatar Motion (candidate)
+
+Atelier procédural local : nom, style humanoïde/robot/néon, couleur, morphologie et rotation. Pose neutre sans caméra ; capture réelle MediaPipe normalisée, sans données inventées. Enregistrement de 18 000 images maximum, export JSON et PNG. Pas de modèle GLB riggé, de génération photoréaliste ou de retargeting Blender validé. CI à confirmer.
+
 # NIKO 3D VIBES V3 — NeuroMotion Engine
 
 ## V3.1 — socle partagé et CI

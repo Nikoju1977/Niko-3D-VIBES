@@ -21,9 +21,18 @@ try:
             diag=page.evaluate("window.StudioNikoCore.diagnostic()")
             assert 'Studio Niko Core: 0.1.0' in diag
             assert 'Aucune donnée de projet' in diag
-            for mode in ['bio','robot','sound','cinema','dj','art','twin','agent','mocap','holo']:
+            for mode in ['bio','robot','sound','cinema','dj','art','twin','agent','mocap','avatar','holo']:
                 btn=page.locator(f'[data-mode={mode}]');btn.click()
                 assert btn.get_attribute('aria-pressed')=='true', mode
+            page.locator('[data-mode=avatar]').click()
+            page.locator('#avatarStyle').select_option('robot')
+            page.locator('#avatarName').fill('TEST AVATAR')
+            with page.expect_download() as info: page.locator('#avatarJson').click()
+            import json
+            data=json.loads(Path(info.value.path()).read_text())
+            assert data['config']['name']=='TEST AVATAR' and data['config']['style']=='robot' and data['frames']==[]
+            with page.expect_download() as info: page.locator('#avatarPng').click()
+            assert Path(info.value.path()).read_bytes()[:4]==bytes([137,80,78,71])
             page.locator('[data-mode=art]').click()
             canvas=page.locator('#advCanvas');canvas.scroll_into_view_if_needed();box=canvas.bounding_box()
             x,y=box['x']+box['width']*.4,box['y']+box['height']*.4
