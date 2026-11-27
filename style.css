@@ -49,3 +49,5 @@ button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible,.b
 .deck-tools{flex-basis:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}.deck-tools input{max-width:100%;width:100%}.deck-tools label{min-width:0;display:grid;gap:4px}#djPanel{align-items:flex-start}#djPanel>span{overflow-wrap:anywhere}.deck-tools span{align-self:end;color:var(--accent);font-variant-numeric:tabular-nums}@media(max-width:480px){.deck-tools{grid-template-columns:minmax(0,1fr)}}
 
 .boot-status{background:#252945;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:0 0 12px}.boot-status a{color:var(--accent);text-decoration:underline}.boot-status[hidden]{display:none!important}
+
+.face-quality{display:grid;gap:8px;min-width:0;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}.face-quality span{color:var(--accent);font-variant-numeric:tabular-nums}.face-quality small{color:var(--muted);font-size:12px}.face-quality input[type=range]{width:100%}

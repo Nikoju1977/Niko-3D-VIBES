@@ -7,3 +7,17 @@ export function faceCrop(points,w,h){const p=points.slice(0,468);const x=Math.ma
 
 // Time-based smoothing with explicit reset on lost tracking; independent of inference rate.
 export class FaceMotionFilter{constructor(tau=90){this.tau=tau;this.reset()}reset(){this.value=null;this.time=null}update(value,t){if(!value||!Number.isFinite(t)||!['roll','yaw','jaw','blinkLeft','blinkRight'].every(k=>Number.isFinite(value[k]))){this.reset();return null;}const v={...value};if(this.time===null||t<=this.time||t-this.time>600){this.value=v;this.time=t;return {...v};}const a=1-Math.exp(-(t-this.time)/this.tau);for(const k of Object.keys(v))this.value[k]+=(v[k]-this.value[k])*a;this.time=t;return {...this.value};}}
+
+// Preserve portrait identity: apply bounded live deviations relative to a neutral live frame.
+// Coordinates are normalized landmark units, not anatomically calibrated measurements.
+export class IdentityDeformer {
+ constructor(){this.reset();}
+ reset(){this.neutral=null;this.last=null;}
+ apply(base,live,target,t,strength=1){
+  if(!Array.isArray(base)||!Array.isArray(live)||base.length!==468||live.length!==468||target?.length!==1404||!Number.isFinite(t))throw Error('Maillage facial incompatible');
+  const src=live.flat(),ref=base.flat();if(!src.every(Number.isFinite)||!ref.every(Number.isFinite))throw Error('Repères non valides');
+  if(!this.neutral){this.neutral=src.slice();this.last=t;target.set(ref);return false;}
+  const a=1-Math.exp(-Math.max(1,Math.min(300,t-this.last))/90),s=Math.max(0,Math.min(1.5,Number.isFinite(strength)?strength:1));this.last=t;
+  for(let i=0;i<target.length;i++){const max=i%3===2?.025:.035,delta=Math.max(-max,Math.min(max,(src[i]-this.neutral[i])*s));target[i]+=(ref[i]+delta-target[i])*a;}return true;
+ }
+}
