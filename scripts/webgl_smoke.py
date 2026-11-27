@@ -64,6 +64,31 @@ try:
         expect(page.locator('#assetExpressionStatus')).to_contain_text('jawOpen')
         page.locator('#assetExpression').fill('80')
         expect(page.locator('#assetExpression')).to_have_value('80')
+        page.locator('#faceTakeRecord').click()
+        page.locator('#assetExpression').fill('20')
+        page.wait_for_timeout(150)
+        page.locator('#assetExpression').fill('90')
+        page.wait_for_timeout(200)
+        page.locator('#faceTakeRecord').click()
+        expect(page.locator('#faceTakeExport')).to_be_enabled()
+        with page.expect_download() as info:
+            page.locator('#faceTakeExport').click()
+        take=Path(info.value.path()).read_bytes()
+        data=json.loads(take)
+        assert data['source']=='manual' and len(data['frames'])>=2
+        assert max(f['values']['jawOpen'] for f in data['frames'])>=.8
+        page.locator('#faceTakePlay').click()
+        expect(page.locator('#faceTakePlay')).to_have_text('Rejouer',timeout=5000)
+        with page.expect_download(timeout=60000) as info:
+            page.locator('#faceTakeGLB').click()
+        animated=Path(info.value.path()).read_bytes()
+        n=struct.unpack_from('<I',animated,12)[0]
+        j=json.loads(animated[20:20+n])
+        assert j['animations'] and any(c['target']['path']=='weights' for c in j['animations'][0]['channels'])
+        page.locator('#faceTakeClear').click()
+        expect(page.locator('#faceTakeExport')).to_be_disabled()
+        page.locator('#faceTakeImport').set_input_files({'name':'take.json','mimeType':'application/json','buffer':take})
+        expect(page.locator('#faceTakeExport')).to_be_enabled()
         page.locator('#realAvatarClear').click()
         expect(page.locator('#assetExpression')).to_be_disabled()
         # Official public MediaPipe test portrait; never use a user's private photo.

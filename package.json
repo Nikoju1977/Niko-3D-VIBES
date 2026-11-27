@@ -1,12 +1,12 @@
 {
   "name": "niko-3d-vibes",
-  "version": "7.2.0-beta.1",
+  "version": "7.3.0-beta.1",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test *.test.js",
     "start": "python3 -m http.server 8000",
-    "check": "node --check app.js && node --check advanced.js && node --check engine.js && node --check scene.js && node --check motion.js && node --check dj.js && node --check sw.js && node --check vision-client.js && node --check vision-worker.js && node --check vision-models.js && node --check neuro.js && node --check studio-niko-core.js && node --check core-diagnostic.js && node --check avatar.js && node --check real-avatar.js && node --check morph-core.js && node --check morph-studio.js && node --check niko-gesture.js && node --check niko-measurement-quality.js && node --check niko-precision-core.js && node --check niko-spatial.js && node --check niko-avatar.js && node --check niko-motion-studio.js && node --check scripts/precision-reference.mjs && node --check niko-native.js && node --check niko-adaptive.js && node --check studio-surface.js && node --check studio-shell.js && node --check expression-rig.js",
+    "check": "node --check app.js && node --check advanced.js && node --check engine.js && node --check scene.js && node --check motion.js && node --check dj.js && node --check sw.js && node --check vision-client.js && node --check vision-worker.js && node --check vision-models.js && node --check neuro.js && node --check studio-niko-core.js && node --check core-diagnostic.js && node --check avatar.js && node --check real-avatar.js && node --check morph-core.js && node --check morph-studio.js && node --check niko-gesture.js && node --check niko-measurement-quality.js && node --check niko-precision-core.js && node --check niko-spatial.js && node --check niko-avatar.js && node --check niko-motion-studio.js && node --check scripts/precision-reference.mjs && node --check niko-native.js && node --check niko-adaptive.js && node --check studio-surface.js && node --check studio-shell.js && node --check expression-rig.js && node --check face-take.js",
     "build": "node scripts/build.mjs",
     "precision:reference": "node scripts/precision-reference.mjs",
     "quantum:tune": "node scripts/quantum-tune.mjs",
