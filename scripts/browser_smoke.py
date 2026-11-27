@@ -16,6 +16,11 @@ try:
             page.on('pageerror', lambda e: errors.append(str(e)))
             page.goto(f'http://127.0.0.1:{server.server_port}/', wait_until='domcontentloaded', timeout=15000)
             page.wait_for_selector('#advCanvas', state='attached', timeout=10000)
+            page.wait_for_function("window.StudioNikoCore?.version === '0.1.0'")
+            assert page.locator('#coreDiag').is_enabled()
+            diag=page.evaluate("window.StudioNikoCore.diagnostic()")
+            assert 'Studio Niko Core: 0.1.0' in diag
+            assert 'Aucune donnée de projet' in diag
             for mode in ['bio','robot','sound','cinema','dj','art','twin','agent','mocap','holo']:
                 btn=page.locator(f'[data-mode={mode}]');btn.click()
                 assert btn.get_attribute('aria-pressed')=='true', mode

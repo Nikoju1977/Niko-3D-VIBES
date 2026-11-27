@@ -1,5 +1,9 @@
 # NIKO 3D VIBES V3 — NeuroMotion Engine
 
+## V3.1 — socle partagé et CI
+
+Copie canonique de Studio Niko Core 0.1.0 (blob fb5d7b84d160979f2e437156922d7b21b1261796), diagnostic volontaire sans télémétrie, aucune donnée caméra ou projet dans le diagnostic. Cache PWA versionné et actifs du build actualisés. Le workflow utilise ubuntu-24.04 : l'échec du run 45938198279 venait de l'incompatibilité Playwright 1.51.0 avec ubuntu26.04-x64. Nouvelle CI et tests sur matériel réel à confirmer.
+
 ## V3 : amélioration du moteur (27 novembre 2026)
 - Inférence MediaPipe en Worker CPU lorsque compatible, avec bascule CPU principal en cas d'échec. Un seul frame en vol, fermeture des modèles et rejet des résultats périmés.
 - Cadence d'inférence adaptative (65–500 ms, mode économie 125 ms minimum, mode fluide 40 ms minimum), latence et backend affichés. Ce ne sont pas des benchmarks.
