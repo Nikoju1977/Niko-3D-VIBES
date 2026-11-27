@@ -1,0 +1,13 @@
+// Studio Niko Design — local expression retargeting. No invented measurements.
+export const CHANNELS=Object.freeze(['eyeBlinkLeft','eyeBlinkRight','jawOpen','mouthSmileLeft','mouthSmileRight','browInnerUp','mouthPucker','eyeWideLeft','eyeWideRight']);
+const clamp=v=>Number.isFinite(v)?Math.max(0,Math.min(1,v)):0;
+const canonical=s=>String(s).toLowerCase().replace(/[^a-z0-9]/g,'');
+const aliases={eyeblinkleft:'eyeBlinkLeft',blinkleft:'eyeBlinkLeft',eyeblinkl:'eyeBlinkLeft',eyeblinkright:'eyeBlinkRight',blinkright:'eyeBlinkRight',eyeblinkr:'eyeBlinkRight',jawopen:'jawOpen',mouthopen:'jawOpen',mouthsmileleft:'mouthSmileLeft',mouthsmileright:'mouthSmileRight',browinnerup:'browInnerUp',mouthpucker:'mouthPucker',eyewideleft:'eyeWideLeft',eyewideright:'eyeWideRight'};
+export function blendshapeValues(categories){const out=Object.fromEntries(CHANNELS.map(k=>[k,0]));for(const c of categories||[]){if(CHANNELS.includes(c?.categoryName))out[c.categoryName]=clamp(c.score);}return out;}
+export function mapTargets(root){const bindings=[];root?.traverse?.(mesh=>{const dict=mesh.morphTargetDictionary,weights=mesh.morphTargetInfluences;if(!dict||!weights)return;for(const [name,index] of Object.entries(dict)){const channel=aliases[canonical(name)];if(channel&&Number.isInteger(index)&&index>=0&&index<weights.length)bindings.push({weights,index,channel});}});return bindings;}
+export function vrmValues(values){return {blinkLeft:clamp(values.eyeBlinkLeft),blinkRight:clamp(values.eyeBlinkRight),aa:clamp(values.jawOpen),happy:clamp((clamp(values.mouthSmileLeft)+clamp(values.mouthSmileRight))/2),surprised:clamp((clamp(values.eyeWideLeft)+clamp(values.eyeWideRight))/2),ou:clamp(values.mouthPucker)};}
+export class ExpressionRig{
+ constructor(root,vrm){this.manager=vrm?.expressionManager||null;this.bindings=this.manager?[]:mapTargets(root);this.channels=this.manager?Object.keys(vrmValues({})).filter(k=>!!this.manager.getExpression(k)):[...new Set(this.bindings.map(b=>b.channel))];this.previous=null;this.time=null;}
+ apply(values,t){const input=Object.fromEntries(CHANNELS.map(k=>[k,clamp(values?.[k])]));const a=this.previous&&Number.isFinite(t)&&t>this.time&&t-this.time<600?1-Math.exp(-(t-this.time)/65):1;if(!this.previous)this.previous=input;else for(const k of CHANNELS)this.previous[k]+=(input[k]-this.previous[k])*a;this.time=t;if(this.manager){const v=vrmValues(this.previous);for(const k of this.channels)this.manager.setValue(k,v[k]);}else for(const b of this.bindings)b.weights[b.index]=this.previous[b.channel];}
+ reset(){this.previous=null;this.time=null;if(this.manager){for(const k of this.channels)this.manager.setValue(k,0);}else for(const b of this.bindings)b.weights[b.index]=0;}
+}

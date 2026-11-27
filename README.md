@@ -1,3 +1,7 @@
+# V7.2 — Expression Studio (candidate)
+
+Les GLB contenant des cibles faciales reconnues et les VRM contenant des expressions peuvent recevoir les coefficients MediaPipe localement. Détection explicite des canaux compatibles, essai manuel de la bouche, lissage et remise à zéro, priorité du suivi facial sur les clips. Ne crée pas de rig pour un modèle statique et ne génère pas d'avatar photoréaliste à partir d'un prompt. Le test navigateur utilise un GLB synthétique muni d'une vraie cible de morphologie ; caméra physique et VRM réel restent à qualifier.
+
 # V7.1 — qualité de production (candidate)
 
 Matériaux de créatures avec relief procédural, détails de modelage, environnement PBR, lissage facial temporel et clignements indépendants. Les formes sont toujours stylisées, non photoréalistes. Import GLB invalide ne doit plus détruire la scène précédente. DJ : deux niveaux, vitesses, positions, master et compresseur de protection (pas de beatmatch ni de limiteur brickwall). Art PNG. Enregistrement vidéo arrêté si onglet masqué. CI à valider.
