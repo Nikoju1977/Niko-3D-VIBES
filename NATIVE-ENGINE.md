@@ -31,3 +31,6 @@ Both CI runs 46004382991 and 46004375466 passed on research revision 6db48d9a0c8
 
 ## V6.4 — Freshness research mode
 FRESHNESS_TUNING is experimental only. Expiry adapts to the median detected interval, with a conservative bounded deadline, clearing event history on expiry. Eighteen synthetic stop/restart conditions compare stale outputs, steady-state coverage and restart recovery; additional guardrails cover the 12 prior dynamic transitions, negative controls and invalid input. No claim of improvement until CI results; application remains on V6.3. No clinical validation.
+
+## V6.4 — Application selection candidate
+Research revision a08445dedc6a8127b4b2bab295cc89261dc24b36 passed both workflows 46004719089 and 46004708816 (86 tests). Across eighteen synthetic stop/restart scenarios stale outputs fell from 280 to 164; mean last stale timestamp relative to stop from 857.11 to 489.56 ms. Steady coverage 100% in those fixtures, mean restart recovery 3334.17 ms unchanged. Prior twelve transition cost unchanged at 1.18087353458. Application selects FRESHNESS_TUNING with versioned export/cache; a further sixteen-condition steady rhythm regression check is required. No claim of human-motion accuracy or clinical validation. Activation revision requires CI and human review before merge/deploy.
