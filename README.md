@@ -1,3 +1,7 @@
+# V7.5.2 — démarrage de secours isolé (candidat)
+
+Le build produit une copie `/live/` sans enregistrement de service worker, dont les chemins de ressources sont distincts des anciens caches racine. Le service worker de secours ne sert plus de ressources depuis CacheStorage ; la disponibilité hors connexion est temporairement désactivée. Le test reproduit un script racine périmé servi par un ancien worker, puis vérifie la navigation dans la version isolée et la réparation. Aucun changement de moteur ni données locales de projet. Le diagnostic sur le téléphone physique reste à confirmer.
+
 # Correctif export vidéo V7.5.1
 
 Le fichier est finalisé en mémoire locale avant téléchargement volontaire ; la vidéo peut être téléchargée de nouveau ou effacée. Le test exige la disponibilité du fichier puis son décodage réel. L'échec intermittent de téléchargement de la V7.5 (workflow 46079322638) reste à revalider avec cette correction.

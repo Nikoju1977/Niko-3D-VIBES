@@ -33,7 +33,7 @@ try:
         page.goto(url+'/recover.html')
         expect(page.locator('#repair')).to_be_visible()
         page.locator('#repair').click()
-        page.wait_for_url('**/?safe=1&repair=*')
+        page.wait_for_url('**/live/?safe=1&repair=*')
         expect(page.locator('#bootStatus')).to_be_hidden()
         browser.close()
     print('Startup: simulated camera device, real MediaPipe inference, stop/restart, recovery: OK')
