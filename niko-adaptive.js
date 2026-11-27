@@ -5,6 +5,8 @@ export const PRECISION_TUNING=Object.freeze({tau:65,fraction:.18,estimator:'phas
 export const SELECTED_TUNING=Object.freeze({tau:65,fraction:.18});
 // V6.3 selection; retained V6.2 mode remains available for comparative tests.
 export const DYNAMIC_TUNING=Object.freeze({tau:65,fraction:.18,estimator:'adaptive_regression'});
+// Research only; production selection remains DYNAMIC_TUNING.
+export const FRESHNESS_TUNING=Object.freeze({tau:65,fraction:.18,estimator:'freshness_regression'});
 const quantile=(values,q)=>{const a=[...values].sort((x,y)=>x-y),i=(a.length-1)*q,j=Math.floor(i);return a[j]+(a[Math.min(j+1,a.length-1)]-a[j])*(i-j);};
 const median=a=>quantile(a,.5);
 // Fit a common time slope with separate intercepts for left and right phases.
@@ -54,7 +56,7 @@ function characterize(window,fraction){
  return {center:(hi+lo)/2,threshold:clamp(range*fraction,4,16),correlation:corr};
 }
 export class AdaptiveCadence{
- constructor({tau=65,fraction=.22,estimator='median'}={}){if(![45,65].includes(tau)||![.18,.22].includes(fraction)||!['median','phase_regression','adaptive_regression'].includes(estimator))throw Error('Unsupported experimental tuning');this.tau=tau;this.fraction=fraction;this.estimator=estimator;this.reset();}
+ constructor({tau=65,fraction=.22,estimator='median'}={}){if(![45,65].includes(tau)||![.18,.22].includes(fraction)||!['median','phase_regression','adaptive_regression','freshness_regression'].includes(estimator))throw Error('Unsupported experimental tuning');this.tau=tau;this.fraction=fraction;this.estimator=estimator;this.reset();}
  reset(){this.total=0;this.clearWindow();}
  clearWindow(){this.last=null;this.start=null;this.filtered=null;this.window=[];this.events=[];this.phase=0;this.anchor=null;this.stats=null;this.lastAnalysis=-Infinity;this.reason='warmup';}
  update(p,t,aspect=1){
@@ -84,13 +86,18 @@ export class AdaptiveCadence{
    this.phase=phase;this.anchor=crossing;
   }
   this.events=this.events.filter(v=>v.t>=t-8000).slice(-32);
-  if(this.estimator==='adaptive_regression'&&recentRhythmShift(this.events))this.events=this.events.slice(-5);
+  if(['adaptive_regression','freshness_regression'].includes(this.estimator)&&recentRhythmShift(this.events))this.events=this.events.slice(-5);
   if(t-this.start<6000||this.events.length<5){this.reason='warmup';return null;}
   if(t-this.events.at(-1).t>1200){this.reason='stale';return null;}
   const halves=this.events.slice(1).map((v,i)=>v.t-this.events[i].t);
   const periods=this.events.slice(2).map((v,i)=>v.phase===this.events[i].phase?(v.t-this.events[i].t)/2:NaN);
   if(periods.some(x=>!Number.isFinite(x))){this.reason='irregular';return null;}
   const m=median(periods),mad=median(periods.map(x=>Math.abs(x-m)));
+  // Expire the last estimate relative to observed cycle length, not only a fixed timeout.
+  // A new estimate requires five fresh events after expiry; no old timestamps are reused.
+  if(this.estimator==='freshness_regression'&&t-this.events.at(-1).t>clamp(1.65*m,380,1200)){
+   this.events=[];this.phase=0;this.anchor=null;this.reason='rhythm_expired';return null;
+  }
   if(mad/m>.12||periods.some(x=>Math.abs(x-m)>.25*m)||halves.some(x=>x<.55*m||x>1.45*m)){this.reason='irregular';return null;}
   const period=this.estimator==='median'?m:phaseRegression(this.events,m);
   const spm=60000/period;if(spm<50||spm>240){this.reason='out_of_range';return null;}

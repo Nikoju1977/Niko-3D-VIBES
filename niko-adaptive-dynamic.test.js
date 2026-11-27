@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {AdaptiveCadence,PRECISION_TUNING,DYNAMIC_TUNING,recentRhythmShift} from './niko-adaptive.js';
+import {AdaptiveCadence,PRECISION_TUNING,DYNAMIC_TUNING,FRESHNESS_TUNING,recentRhythmShift} from './niko-adaptive.js';
 const p=(x,y)=>({x,y,visibility:1});
 function rng(seed){let state=seed>>>0;return ()=>{state=(Math.imul(1664525,state)+1013904223)>>>0;return state/4294967296;};}
 function frame(t,c,r){
@@ -58,4 +58,16 @@ test('experimental dynamic window reduces transition cost while preserving stati
   const c={from:145,to:175,amp:19,bias:11,aspect:1.6,noise:.008,mode};
   assert.equal(trial(c,DYNAMIC_TUNING,81727).accepted,0);
  }
+});
+
+test('freshness candidate preserves dynamic transition score',()=>{
+ const rows=[];
+ for(const [i,[from,to]] of [[95,145],[145,95],[115,175],[175,115],[110,160],[160,110]].entries())for(const noise of [.003,.008]){
+  const c={from,to,amp:19,bias:i%2?11:-9,aspect:i%2?1.6:1,noise,mode:'alternating'};
+  const seed=561271+i*100+Math.round(noise*1e4),base=trial(c,DYNAMIC_TUNING,seed),candidate=trial(c,FRESHNESS_TUNING,seed);
+  rows.push({base,candidate});
+ }
+ const mean=k=>rows.reduce((s,x)=>s+x[k].penalizedError,0)/rows.length;
+ console.log('V64_TRANSITIONS',JSON.stringify({baselineCost:mean('base'),candidateCost:mean('candidate')}));
+ assert.ok(mean('candidate')<=mean('base')+.5,'Freshness must preserve transition accuracy');
 });

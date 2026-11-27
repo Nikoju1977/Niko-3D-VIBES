@@ -28,3 +28,6 @@ V6.2 commit 321be4a070dd001f6ed036eb583e31a5bfde3e14 passed both CI runs 4600307
 
 ## V6.3 — Application selection candidate
 Both CI runs 46004382991 and 46004375466 passed on research revision 6db48d9a0c88f55401cc0eb8c0fdb528d5a0e7bd. On twelve synthetic abrupt changes, penalized transition error 22.6757609801 -> 1.1808735346, coverage 24.5868% -> 97.0386%, mean five-consecutive-sample recovery time 7563.75 -> 2292.83 ms. These are engineering benchmark results, not clinical or human-motion evidence. The app now selects DYNAMIC_TUNING, with versioned export and cache. Added a 16-condition steady rhythm comparison against V6.2 (coverage noninferiority within one percentage point and MAE tolerance .02). This activation commit requires its own CI and human review before merge/deployment.
+
+## V6.4 — Freshness research mode
+FRESHNESS_TUNING is experimental only. Expiry adapts to the median detected interval, with a conservative bounded deadline, clearing event history on expiry. Eighteen synthetic stop/restart conditions compare stale outputs, steady-state coverage and restart recovery; additional guardrails cover the 12 prior dynamic transitions, negative controls and invalid input. No claim of improvement until CI results; application remains on V6.3. No clinical validation.
