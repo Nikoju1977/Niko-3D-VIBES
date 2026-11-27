@@ -1,3 +1,11 @@
+V6.5 — 27 novembre 2026 — révision 5a006b99c1e619e4b8164e51c20fde33a59861cb
+Run 46005477907 : SUCCESS ; 91/91 tests Node, syntaxe, vérification, build 33 ressources, Chromium 1280/390 px (11 ateliers, export OBJ, arrêt, contrôle WebGL2 et repli), WebGL prompt/rendu/PNG/GLB/réimport.
+Run 46005485231 : 91/91 tests, syntaxe et build réussis ; installation Playwright --with-deps échoue sur https://packages.microsoft.com/ubuntu/24.04/prod/dists/noble/InRelease (HTTP 403). Pas de résultat navigateur sur ce run.
+Correction CI : installation Chromium sans rafraîchissement apt sur runner Ubuntu hébergé ; tests navigateur obligatoires conservés. Révision suivante à vérifier.
+Alias Vercel READY sur V3.4, SHA 9a0ec8bda4fb8c06b7806e1ac1f5828611df5991 ; candidat non déployé.
+Pas de validation caméra physique, éclairage humain, biomécanique clinique, Blender physique, performances mobiles réelles.
+
+Historique :
 V3 — 27 novembre 2026
 npm test: 25/25 PASS (13 historiques, 12 nouveaux; Worker et MIDI testés avec doubles).
 npm run check: PASS (11 JS).

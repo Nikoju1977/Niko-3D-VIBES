@@ -1,0 +1,5 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {buildCircuit,experiment,decodeCounts} from './scripts/quantum-tune.mjs';
+test('QAOA encodes four measured candidate costs and a bounded two-qubit circuit',()=>{const r=experiment();assert.equal(r.results.length,4);assert.equal(r.hardwareExecuted,false);assert.equal(r.circuit.qubits,2);assert.equal(r.circuit.gates.length,9);assert.ok(r.results.every(x=>Number.isFinite(x.train.cost)&&Number.isFinite(x.holdout.cost)));assert.equal(r.results.find(x=>x.state===r.optimum).train.cost,Math.min(...r.results.map(x=>x.train.cost)));console.log('QUANTUM_TUNING_CPU',JSON.stringify(r));});
+test('circuit rejects malformed scores and decoding never fabricates hardware proof',()=>{assert.throws(()=>buildCircuit([1,2,NaN,4]));const r={optimum:'10',results:[{state:'00',train:{cost:5},holdout:{}},{state:'10',train:{cost:1},holdout:{}}]};assert.equal(decodeCounts(r,{'00':100,'10':5}).matchedExactOptimum,true);assert.throws(()=>decodeCounts(r,{'11x':1}));});

@@ -13,3 +13,13 @@ La politique LICENSE.md reste inchangée. Les éventuels droits sur les contribu
 - niko-avatar.js : nouveau module de retargeting directionnel et quaternion à partir de géométrie générale; repères MediaPipe tiers, aucun nouveau modèle IA propriétaire.
 
 - niko-motion-studio.js : nouveau module de morphologie et export GLB, géométrie cylindrique procédurale, assistance IA; licences et notices antérieures conservées.
+
+- V5 niko-native.js : nouveau calcul d'angle par atan2, cadence par alternance de flexion bilatérale, assistance IA. Ancien engine.js conservé pour comparaison et provenance, exclu du build. Les conventions MediaPipe et commandes virtuelles compatibles restent en usage. Pas de certification clean-room ni modification de licence.
+
+- V5.1 : interpolation temporelle des franchissements et estimation sur périodes de même phase; benchmark synthétique déterministe, non clinique.
+
+- V6 : estimateur adaptatif bilatéral par quantiles robustes et corrélation, nouveau module niko-adaptive.js; V5.1 conservé comme référence. Assistance IA ChatGPT, aucun appel Agnes attesté.
+
+- V6.1–V6.5 : recherche classique, régression par phase, détection de changement de rythme, expiration adaptative et rejet géométrique. Assistance IA ChatGPT ; tests synthétiques, aucune exécution matérielle IBM ni invocation Agnes attestée. Notices et licences inchangées.
+
+- Notice SND-PROPRIETARY-1.0 formalisée ; périmètre conditionnel dans RIGHTS.md. Les notices MIT restent inchangées. Manifeste SHA-256 du build, sans valeur d'horodatage qualifié ni garantie de titularité.

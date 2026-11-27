@@ -1,3 +1,36 @@
+# NIKO 3D VIBES — V6.5 Robust Vision (candidat)
+
+Studio Niko Design · PWA créative et analyse expérimentale du mouvement. **Non médical.**
+
+[Application publique](https://niko-3d-vibes.vercel.app/) · [Candidat V6.5 / PR 7](https://github.com/Nikoju1977/Niko-3D-VIBES/pull/7) · [CI](https://github.com/Nikoju1977/Niko-3D-VIBES/actions)
+
+**État vérifié le 27 novembre 2026 :** l'alias Vercel est READY sur V3.4 (commit 9a0ec8bda4fb8c06b7806e1ac1f5828611df5991), pas V6.5. Le candidat V6.5 5a006b99c1e619e4b8164e51c20fde33a59861cb a réussi 91/91 tests et un workflow complet 46005477907 ; le workflow 46005485231 a aussi réussi les tests Node et le build mais échoué à l'installation Playwright (dépôt Microsoft HTTP 403). La révision documentaire/CI suivante doit être validée à son tour. Aucun lancement IBM, aucune invocation Agnes attestée, aucune validation clinique ou caméra réelle.
+
+## Fonctions du candidat
+- Onze ateliers : Holo, biomécanique, robot virtuel, Motion Sound, Cinema, DJ, Art 3D, Digital Twin, Gesture Agent, Motion Capture, Avatar. Voir les guides historiques ci-dessous et les documents des moteurs.
+- V6.5 : angles 2D et alternances bilatérales de genoux/minute, régression temporelle, adaptation de rythme, expiration des estimations, rejet des anomalies géométriques. Les alternances ne sont pas des pas mesurés. Pas de diagnostic ou mesure médicale.
+- Vision MediaPipe sur l'appareil, modèles tiers téléchargés au premier usage. Rendu Canvas et WebGL2 avec repli ; export GLB animé procédural et rig directionnel expérimental, pas de reconstruction photoréaliste garantie. Aucun nouveau modèle IA propriétaire.
+- Export JSON local explicite, option AES-GCM/PBKDF2 par phrase secrète ; export CSV non chiffré avec confirmation. La protection de l'export ne protège pas le JavaScript public contre la copie. Licence et provenance préservées.
+
+## Preuves comparatives (signaux synthétiques distincts)
+| Version / banc | Résultat |
+|---|---|
+| V6.2, 16 conditions positives | MAE 0,3390 → 0,1109 alternances/min ; couverture 100 %, trois contrôles négatifs sans résultat |
+| V6.3, 12 transitions | score pénalisé 22,6758 → 1,1809 ; récupération moyenne 7,56 → 2,29 s |
+| V6.4, 18 arrêts/reprises | 280 → 164 sorties périmées ; récupération moyenne 3,33 s inchangée |
+| V6.5, 12 conditions avec anomalies injectées | 276/276 anomalies rejetées ; MAE acceptée 0,0752 → 0,0421 ; couverture 100 → 95,62 % ; coût pénalisé 0,0752 → 1,3545 |
+
+Ces chiffres ne sont pas comparables d'un banc à l'autre et ne prouvent pas la précision humaine réelle. Voir [NATIVE-ENGINE.md](NATIVE-ENGINE.md), [TESTS.txt](TESTS.txt), [PROVENANCE.md](PROVENANCE.md).
+
+## Licence et intégrité
+[Studio Niko Design Proprietary License 1.0](LICENSE.md) réserve les contributions originales effectivement détenues, sans restreindre les droits tiers. [Inventaire](RIGHTS.md). Le build génère un manifeste SHA-256 ; `npm run integrity:verify` vérifie les fichiers. Aucun brevet, dépôt INPI ou protection anti-copie revendiqué.
+
+## Vérification et démarrage
+Node 22 et Python 3.12 : `npm test && npm run check && python3 scripts/verify.py && npm run build`. Ouvrir `npm start` puis http://localhost:8000, ou héberger le build via HTTPS. Voir [PUBLISH.md](PUBLISH.md). Le forfait gratuit est soumis à quota ; ne pas contourner les limites.
+
+## Historique des versions (informations d'époque)
+Les sections suivantes sont conservées pour la traçabilité ; les états de tests et limitations décrivent les anciennes versions, pas le candidat actuel.
+
 # V3.4 — fiabilité et ateliers sans caméra (candidat)
 
 Robot manuel, zoom Holo, pavé synthétiseur tactile et clavier, timbres, caméra virtuelle manuelle enregistrable, export biomécanique CSV, désarmement de l'agent à la sortie du module, remise à zéro du visage après perte de suivi, arrêt audio lorsque l'onglet est masqué, cache versionné. Tests navigateur étendus aux nouveaux contrôles, test de reconstruction sur portrait public MediaPipe (pas de portrait personnel). Le photoréalisme et les appareils physiques ne sont pas validés par ces essais.
@@ -79,3 +112,6 @@ Le moteur local AutoCoder (blob `2ca34b69a196e14881bb1c50847d4764387761a5`) est 
 
 ## V4 PRO — consolidation
 Fusion fonctionnelle de la V3.4 et des moteurs V4 expérimentaux. Les onze modes, l'avatar GLB/VRM et les fonctions manuelles V3.4 sont conservés. Digital Twin propose en plus le rig directionnel et le GLB animé. Voir PRECISION-CORE.md, MEDICAL-QUALITY-SECURITY.md, SPATIAL-ENGINE.md, AVATAR-ENGINE.md et MOTION-STUDIO.md. Aucun usage médical validé. Tests navigateur et CI à confirmer sur cette consolidation; pas de publication automatique depuis la branche.
+
+## V5 Native Engine — candidate
+Angle-based gesture engine selected exclusively at runtime; new bilateral knee-phase estimator, non-clinical. Historical MIT engine retained in source and tests, excluded from production build. See NATIVE-ENGINE.md. Notices unchanged.
