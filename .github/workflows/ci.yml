@@ -23,6 +23,7 @@ jobs:
       - run: npm run check
       - run: python3 scripts/verify.py
       - run: npm run build
+      - run: npm run integrity:verify
       - run: python -m pip install playwright==1.51.0
       # Ubuntu hosted runners include Chromium system libraries. Avoid unrelated apt repositories.
       # Browser smoke tests remain mandatory and fail if runtime libraries are absent.

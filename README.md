@@ -22,6 +22,9 @@ Studio Niko Design · PWA créative et analyse expérimentale du mouvement. **No
 
 Ces chiffres ne sont pas comparables d'un banc à l'autre et ne prouvent pas la précision humaine réelle. Voir [NATIVE-ENGINE.md](NATIVE-ENGINE.md), [TESTS.txt](TESTS.txt), [PROVENANCE.md](PROVENANCE.md).
 
+## Licence et intégrité
+[Studio Niko Design Proprietary License 1.0](LICENSE.md) réserve les contributions originales effectivement détenues, sans restreindre les droits tiers. [Inventaire](RIGHTS.md). Le build génère un manifeste SHA-256 ; `npm run integrity:verify` vérifie les fichiers. Aucun brevet, dépôt INPI ou protection anti-copie revendiqué.
+
 ## Vérification et démarrage
 Node 22 et Python 3.12 : `npm test && npm run check && python3 scripts/verify.py && npm run build`. Ouvrir `npm start` puis http://localhost:8000, ou héberger le build via HTTPS. Voir [PUBLISH.md](PUBLISH.md). Le forfait gratuit est soumis à quota ; ne pas contourner les limites.
 

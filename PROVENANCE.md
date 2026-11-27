@@ -21,3 +21,5 @@ La politique LICENSE.md reste inchangée. Les éventuels droits sur les contribu
 - V6 : estimateur adaptatif bilatéral par quantiles robustes et corrélation, nouveau module niko-adaptive.js; V5.1 conservé comme référence. Assistance IA ChatGPT, aucun appel Agnes attesté.
 
 - V6.1–V6.5 : recherche classique, régression par phase, détection de changement de rythme, expiration adaptative et rejet géométrique. Assistance IA ChatGPT ; tests synthétiques, aucune exécution matérielle IBM ni invocation Agnes attestée. Notices et licences inchangées.
+
+- Notice SND-PROPRIETARY-1.0 formalisée ; périmètre conditionnel dans RIGHTS.md. Les notices MIT restent inchangées. Manifeste SHA-256 du build, sans valeur d'horodatage qualifié ni garantie de titularité.
