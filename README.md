@@ -1,3 +1,15 @@
+# Correctif export vidéo V7.5.1
+
+Le fichier est finalisé en mémoire locale avant téléchargement volontaire ; la vidéo peut être téléchargée de nouveau ou effacée. Le test exige la disponibilité du fichier puis son décodage réel. L'échec intermittent de téléchargement de la V7.5 (workflow 46079322638) reste à revalider avec cette correction.
+
+# V7.5.1 — budget de rendu et endurance (candidate)
+
+Le cycle de rendu ralentit selon le coût CPU mesuré, avec plafonds par profil et réduction de résolution en économie. Les surfaces Canvas immobiles ne sont recalculées qu'après changement de vue. Les commandes de suivi sont invalidées une seule fois après perte de fraîcheur du signal mains/corps ; les commandes manuelles sont indépendantes. Test d'endurance Chromium : 60 secondes de flux caméra simulé, vraie inférence MediaPipe et six changements de mode/profil. Mesure CPU de soumission de rendu, pas mesure GPU ni garantie de température/autonomie. Appareils physiques et plusieurs heures de session restent à tester.
+
+# V7.5 — qualité média (candidate)
+
+Lecture DJ conditionnée au décodage des métadonnées, erreurs visibles, crête échantillonnée dBFS réellement mesurée après compression (pas une mesure true peak), deux pistes WAV testées avec contrôle master et arrêt. Enregistrement du rendu WebGL, export WebM ou MP4 selon MediaRecorder, test de décodage du résultat. Nouveau test de démarrage et navigation Firefox/WebKit à viewport mobile (pas Safari ou téléphone physique). Fusion après validation complète. Pas de nouveau service payant ni de génération photoréaliste.
+
 # V7.4 — stabilité du suivi facial (candidate)
 
 Conservation du maillage photographique : variations relatives des repères par rapport à une calibration neutre, amplitudes bornées et lissage. Décodage de portrait alternatif si ImageBitmap indisponible, détection des nouvelles images uniquement, indication réelle du temps d'inférence, recalibration explicite. Nouveau test de suivi MediaPipe sur flux vidéo construit à partir d'un portrait public, sans webcam physique et sans données personnelles de l'utilisateur. Ce n'est pas une reconstruction complète ni une validation anatomique. Fusion après CI.

@@ -31,3 +31,7 @@ jobs:
       - run: python scripts/browser_smoke.py
       - run: python scripts/webgl_smoke.py
       - run: python scripts/startup_smoke.py
+      - run: python scripts/media_smoke.py
+      - run: python scripts/endurance_smoke.py
+      - run: python -m playwright install --with-deps firefox webkit
+      - run: python scripts/compat_smoke.py
