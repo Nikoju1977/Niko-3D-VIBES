@@ -42,9 +42,12 @@ try:
             assert result['count'] == 7 and result['clinical'] is False, result
             page.locator('#morphProfile').select_option('robot')
             page.locator('#takeRecord').click()
-            assert 'attente corps complet' in page.locator('#takeStatus').inner_text()
+            assert 'attente corps complet' in page.locator('#takeStatus').inner_text(), page.locator('#takeStatus').inner_text()
+            assert page.locator('#takeRecord').inner_text() == 'Arrêter la prise'
             assert page.locator('#takeGLB').is_disabled()
             page.locator('#takeRecord').click()
+            assert page.locator('#takeRecord').inner_text() == 'Enregistrer la prise'
+            assert 'arrêtée' in page.locator('#takeStatus').inner_text()
             page.locator('#twinRig').select_option('landmarks')
             page.locator('[data-mode=holo]').click()
             page.locator('#renderer').select_option('gpu')
