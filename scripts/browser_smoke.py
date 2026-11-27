@@ -24,6 +24,32 @@ try:
             for mode in ['bio','robot','sound','cinema','dj','art','twin','agent','mocap','avatar','holo']:
                 btn=page.locator(f'[data-mode={mode}]');btn.click()
                 assert btn.get_attribute('aria-pressed')=='true', mode
+            page.locator('[data-mode=robot]').click()
+            page.locator('#robotManual').select_option('SCAN')
+            assert page.locator('#robotState').inner_text()=='SCAN'
+            page.locator('#idle').click()
+            assert page.locator('#robotState').inner_text()=='REPOS'
+            page.locator('[data-mode=agent]').click()
+            page.locator('#arm').check()
+            page.locator('[data-mode=holo]').click()
+            assert not page.locator('#arm').is_checked()
+            page.locator('#zoomIn').click()
+            page.locator('[data-mode=sound]').click()
+            page.locator('#audio').click()
+            page.locator('#wave').select_option('sine')
+            assert page.locator('#audio').inner_text()=='Synthétiseur actif'
+            page.locator('#soundPad').focus()
+            page.keyboard.press('Space')
+            page.locator('[data-mode=cinema]').click()
+            page.locator('#camRec').click()
+            page.wait_for_timeout(350)
+            page.locator('#camRec').click()
+            with page.expect_download() as info: page.locator('#camExport').click()
+            import json
+            assert len(json.loads(Path(info.value.path()).read_text())['frames'])>0
+            page.locator('[data-mode=bio]').click()
+            with page.expect_download() as info: page.locator('#bioCsv').click()
+            assert 'cadence_spm' in Path(info.value.path()).read_text()
             page.locator('[data-mode=avatar]').click()
             page.locator('#morphExample').click()
             assert 'singe' in page.locator('#morphPrompt').input_value()
