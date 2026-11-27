@@ -3,7 +3,7 @@ import {angle,clamp} from './niko-native.js';
 export const ADAPTIVE_VERSION='6.0.0';
 const quantile=(values,q)=>{const a=[...values].sort((x,y)=>x-y),i=(a.length-1)*q,j=Math.floor(i);return a[j]+(a[Math.min(j+1,a.length-1)]-a[j])*(i-j);};
 const median=a=>quantile(a,.5);
-function characterize(window){
+function characterize(window,fraction){
  const n=window.length;if(n<16)return null;
  const l=window.map(x=>x.l),r=window.map(x=>x.r),d=window.map(x=>x.d);
  const mean=a=>a.reduce((s,v)=>s+v,0)/n,ml=mean(l),mr=mean(r);
@@ -12,10 +12,10 @@ function characterize(window){
  const al=quantile(l,.9)-quantile(l,.1),ar=quantile(r,.9)-quantile(r,.1);
  const lo=quantile(d,.1),hi=quantile(d,.9),range=hi-lo;
  if(al<8||ar<8||Math.max(al,ar)>4*Math.min(al,ar)||corr>-.65||range<16)return null;
- return {center:(hi+lo)/2,threshold:clamp(range*.22,4,16),correlation:corr};
+ return {center:(hi+lo)/2,threshold:clamp(range*fraction,4,16),correlation:corr};
 }
 export class AdaptiveCadence{
- constructor(){this.reset();}
+ constructor({tau=65,fraction=.22}={}){if(![45,65].includes(tau)||![.18,.22].includes(fraction))throw Error('Unsupported experimental tuning');this.tau=tau;this.fraction=fraction;this.reset();}
  reset(){this.total=0;this.clearWindow();}
  clearWindow(){this.last=null;this.start=null;this.filtered=null;this.window=[];this.events=[];this.phase=0;this.anchor=null;this.stats=null;this.lastAnalysis=-Infinity;this.reason='warmup';}
  update(p,t,aspect=1){
@@ -24,12 +24,12 @@ export class AdaptiveCadence{
   if(l===null||r===null){this.clearWindow();this.reason='invalid_landmarks';return null;}
   if(this.last!==null&&(t<=this.last||t-this.last>160)){this.clearWindow();this.reason='sampling_gap';return null;}
   const prev=this.filtered,dt=this.last===null?0:t-this.last;this.last=t;if(this.start===null)this.start=t;
-  this.filtered=prev===null?l-r:prev+(1-Math.exp(-dt/65))*(l-r-prev);
+  this.filtered=prev===null?l-r:prev+(1-Math.exp(-dt/this.tau))*(l-r-prev);
   this.window.push({t,l,r,d:this.filtered});
   while(this.window.length&&(this.window[0].t<t-3200||this.window.length>256))this.window.shift();
   if(t-this.lastAnalysis>=250){
    this.lastAnalysis=t;
-   const next=this.window.length>=16&&t-this.window[0].t>=1800?characterize(this.window):null;
+   const next=this.window.length>=16&&t-this.window[0].t>=1800?characterize(this.window,this.fraction):null;
    if(!next){this.phase=0;this.anchor=null;this.events=[];}
    this.stats=next;
   }
