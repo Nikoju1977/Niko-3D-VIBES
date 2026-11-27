@@ -116,6 +116,8 @@ try:
             canvas=page.locator('#advCanvas');canvas.scroll_into_view_if_needed();box=canvas.bounding_box()
             x,y=box['x']+box['width']*.4,box['y']+box['height']*.4
             page.mouse.move(x,y);page.mouse.down();page.mouse.move(x+30,y+20,steps=6);page.mouse.up()
+            with page.expect_download() as image_info: page.locator('#artImage').click()
+            assert Path(image_info.value.path()).read_bytes()[:4]==bytes([137,80,78,71])
             with page.expect_download() as info: page.locator('#artExport').click()
             data=Path(info.value.path()).read_text();assert '\nv ' in data and '\nl ' in data
             page.locator('#stop').click();assert 'ARRÊTÉ' in page.locator('#status').inner_text()

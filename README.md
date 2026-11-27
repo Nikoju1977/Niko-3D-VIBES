@@ -1,3 +1,7 @@
+# V7.1 — qualité de production (candidate)
+
+Matériaux de créatures avec relief procédural, détails de modelage, environnement PBR, lissage facial temporel et clignements indépendants. Les formes sont toujours stylisées, non photoréalistes. Import GLB invalide ne doit plus détruire la scène précédente. DJ : deux niveaux, vitesses, positions, master et compresseur de protection (pas de beatmatch ni de limiteur brickwall). Art PNG. Enregistrement vidéo arrêté si onglet masqué. CI à valider.
+
 ## V7 — atelier de lecture et export vidéo
 
 Lecture des clips GLB incorporés (AnimationMixer), choix du clip, lecture/pause, position, vitesse, recadrage et export WebM local de 60 s maximum si MediaRecorder est disponible. La capture vidéo ne contient ni audio ni webcam. Le test WebGL utilise une animation synthétique déterministe générée par le moteur GLB, et non une prétendue capture réelle. Le photoréalisme reste dépendant du modèle importé.
