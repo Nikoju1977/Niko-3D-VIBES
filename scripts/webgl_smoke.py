@@ -57,6 +57,15 @@ try:
         expect(page.locator('#assetPlay')).to_be_enabled()
         page.locator('#realAvatarClear').click()
         expect(page.locator('#assetPlay')).to_be_disabled()
+        # Actual glTF morph target import, manual test, and capability detection.
+        expressive=page.evaluate("""async()=>{const T=await import('three');const {GLTFExporter}=await import('three/addons/exporters/GLTFExporter.js');const g=new T.BoxGeometry(1,1,1),p=g.attributes.position;const a=new Float32Array(p.array);for(let i=0;i<a.length;i+=3)a[i+1]*=1.2;g.morphAttributes.position=[new T.BufferAttribute(a,3)];const m=new T.Mesh(g,new T.MeshStandardMaterial({color:0x5588dd}));m.morphTargetDictionary={jawOpen:0};m.morphTargetInfluences=[0];return Array.from(new Uint8Array(await new GLTFExporter().parseAsync(m,{binary:true})));}""")
+        page.locator('#realAvatarFile').set_input_files({'name':'expression.glb','mimeType':'model/gltf-binary','buffer':bytes(expressive)})
+        expect(page.locator('#assetExpression')).to_be_enabled(timeout=60000)
+        expect(page.locator('#assetExpressionStatus')).to_contain_text('jawOpen')
+        page.locator('#assetExpression').fill('80')
+        expect(page.locator('#assetExpression')).to_have_value('80')
+        page.locator('#realAvatarClear').click()
+        expect(page.locator('#assetExpression')).to_be_disabled()
         # Official public MediaPipe test portrait; never use a user's private photo.
         with urlopen('https://storage.googleapis.com/mediapipe-assets/portrait.jpg', timeout=30) as response:
             portrait=response.read(5*1024*1024)
