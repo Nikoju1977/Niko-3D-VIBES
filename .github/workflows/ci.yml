@@ -30,3 +30,4 @@ jobs:
       - run: python -m playwright install chromium
       - run: python scripts/browser_smoke.py
       - run: python scripts/webgl_smoke.py
+      - run: python scripts/startup_smoke.py
