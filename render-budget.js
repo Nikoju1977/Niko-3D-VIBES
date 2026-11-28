@@ -8,6 +8,6 @@ export class RenderBudget {
 export class FreshSignal{
  constructor(limit=500){this.limit=limit;this.reset();}
  reset(){this.last=null;this.expired=false;}
- accept(t){if(!Number.isFinite(t))return;this.last=t;this.expired=false;}
+ accept(t){if(!Number.isFinite(t)||(this.last!==null&&t<=this.last))return;this.last=t;this.expired=false;}
  expire(t){if(this.last===null||this.expired||!Number.isFinite(t)||t-this.last<=this.limit)return false;this.expired=true;return true;}
 }
